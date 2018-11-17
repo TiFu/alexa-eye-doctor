@@ -7,6 +7,15 @@ lambda_client = boto3.client('lambda', region_name="eu-west-1")
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource("dynamodb", region_name="eu-west-1")
 consulationRequestTable = dynamodb.Table("ConsultationRequest")
+infoRequestTable = dynamodb.Table("RequestInfo")
+
+def findPatient(givenName, fullName):
+    patients = getPatientList()
+    potentialPatients = list(filter(lambda x: x["givenName"] == givenName and x["familyName"] == fullName))
+    if len(potentialPatients) == 0:
+        return None
+    else:
+        return potentialPatients[0]
 
 def getPatientList():
     result = lambda_client.invoke(FunctionName="dr-cloud-patient-service", Payload=json.dumps({ "action": "list"}))
@@ -28,6 +37,7 @@ def uploadImage(patientId, fileName, bucket="dr-cloud-128740296733-eu-west-1"):
     key = patientId.split("-")[0] + "/" + patientId + "/" + os.path.basename(fileName)
     result = s3_client.upload_file(fileName, bucket, key)
 
+
 def addConsultationRequest(patientId):
     guid = uuid.uuid4()
     consulationRequestTable.put_item(Item={"consultationId": str(guid), "patientId": patientId})
@@ -38,8 +48,19 @@ def deleteConsultationRequests(consultationId):
 def getConsultationRequests():
     return consulationRequestTable.scan()["Items"]
 
+
+def addInformationRequest(patientId):
+    infoRequestTable.put_item(Item={"patientId": str(patientId)})
+
+def deleteInformationRequest(patientId):
+    infoRequestTable.delete_item(Key={"patientId": str(patientId)})
+
+def getInformationRequest(patientId):
+    return "Item" in infoRequestTable.get_item(Key={"patientId": str(patientId)})
+
 # defining the bucket like this is horrible - but hey it's a hackatohn
 # also not making the region a variable
 def getImageLink(key, bucket="dr-cloud-128740296733-eu-west-1"):
     return "https://s3-eu-west-1.amazonaws.com/" + bucket + "/" + key
 
+print(getInformationRequest("21c03410-ea14-11e8-badf-6542a9f38021"))
