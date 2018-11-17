@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Diagnosis</title>
+    <title>Diagnose - patient list</title>
 
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -108,6 +108,10 @@
             })
         }
     </script>
+
+    <!-- Icon -->
+    <link rel="shortcut icon" href="img/Logo.ico">
+
 </head>
 <body>
     <div id="patientEntry" style="display: none">
@@ -142,7 +146,7 @@
                 <div class="row">
                     <div class="col-12 d-flex flex-wrap justify-content-between align-items-center">
                         <div class="site-branding d-flex align-items-center">
-                           <a class="d-block" href="patient_list.html" rel="home"><img class="d-block" src="img/Logo.ico" alt="logo"></a>
+                            <a class="d-block" href="patient_list.html" rel="home"><img class="d-block" src="img/Logo.ico" alt="logo"></a>
                         </div><!-- .site-branding -->
 
                         <nav class="site-navigation d-flex justify-content-end align-items-center">
@@ -171,6 +175,10 @@
                     <div class="upcoming-events" id="content">
                         <div class="section-heading">
                             <h2 class="entry-title">Registered patients</h2>
+
+                            <div style="padding-top:50px">
+                                <div class="loader" style="margin:auto;"></div> 
+                            </div>
                         </div><!-- .section-heading -->
                     </div><!-- .upcoming-events -->
                 </div><!-- .col -->
