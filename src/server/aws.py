@@ -8,6 +8,7 @@ lambda_client = boto3.client('lambda', region_name="eu-west-1")
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource("dynamodb", region_name="eu-west-1")
 consulationRequestTable = dynamodb.Table("ConsultationRequest")
+patientTable = dynamodb.Table("hackatum2018-PatientTable-17H2N6ERAUIAD")
 infoRequestTable = dynamodb.Table("RequestInfo")
 diagnosisTable = dynamodb.Table("Diagnosis")
 
@@ -32,6 +33,20 @@ def createPatient(givenName, familyName):
     result = lambda_client.invoke(FunctionName="dr-cloud-patient-service", Payload=json.dumps({ "action": "create", "body": { "givenName": givenName, "familyName": familyName}}))
     return json.loads(result["Payload"].read().decode())
 
+def updatePatientEyeColor(patientId, eyeColor):
+    response = table.update_item(
+        Key={
+            'patientId': patientId,
+        },
+        UpdateExpression="set EyeColorBlue = :bl, EyeColorBrown = :br, EyeColorGreen = :g",
+        ExpressionAttributeValues={
+            ':bl': eyeColor["blue"],
+            ':br': eyeColor["brown"],
+            ':g': eyeColor["green"]
+        },
+        ReturnValues="UPDATED_NEW"
+    )    
+
 def getImageList(patientId):
     result = lambda_client.invoke(FunctionName="dr-cloud-image-service", Payload=json.dumps({ "action": "list", "body": { "patientId": patientId}}))
     return json.loads(result["Payload"].read().decode())
@@ -49,7 +64,6 @@ def deleteConsultationRequests(consultationId):
 
 def getConsultationRequests():
     return consulationRequestTable.scan()["Items"]
-
 
 def addInformationRequest(patientId):
     infoRequestTable.put_item(Item={"patientId": str(patientId)})

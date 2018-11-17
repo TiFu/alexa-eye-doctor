@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from aws import getPatientList ,getPatientInfo, getImageList, getImageLink, getConsultationRequests, getDiagnosis, findPatient, uploadImage
+from aws import getPatientList ,getPatientInfo, updatePatientEyeColor, getImageList, getImageLink, getConsultationRequests, getDiagnosis, findPatient, uploadImage
 import json
 from state import lastPatientId
 from face_processor import FaceProcessor
@@ -64,6 +64,7 @@ def uploadImageRequest():
         uploadImage(lastPatientId, eyeData[0], IMAGE_PATH + "/leftEye_" + str(uuid.uuid4()) + ".jpg")
         uploadImage(lastPatientId, eyeData[1], IMAGE_PATH + "/rightEye_" + str(uuid.uuid4()) + ".jpg")
         uploadImage(lastPatientId, f, "face.jpg")
+        updatePatientEyeColor(lastPatientId, eyeData[2])
         return str(True)
     
 

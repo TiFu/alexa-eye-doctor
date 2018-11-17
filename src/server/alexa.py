@@ -1,5 +1,5 @@
 from flask_ask import Ask, question, statement, session
-from aws import addConsultationRequest, addInformationRequest, findPatient, getPatientInfo, addDiagnosis, getDiagnosis, getImageLink, getImageList
+from aws import addConsultationRequest, addInformationRequest, updatePatientEyeColor, findPatient, getPatientInfo, addDiagnosis, getDiagnosis, getImageLink, getImageList
 from state import setLastPatientId
 from datetime import datetime
 
