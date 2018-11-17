@@ -1,0 +1,49 @@
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+<script>
+$(
+	function() {
+		console.log("Initializing socket!")
+
+		var patient_socket = io.connect("http://localhost:5000/patient")
+		patient_socket.on("connect", () => {
+			console.log("[PATIENT] Connected to server!")
+		})
+
+		patient_socket.on("patient_data", (data) => {
+			console.log("[PATIENT] Data: ", data)
+		})
+
+		patient_socket.on("new_diagnosis", () => {
+			console.log("[PATIENT] New Diagnosis ");
+		})
+
+		patient_socket.on("new_picture_request", () => {
+			console.log("[PATIENT] new picture request");
+		});
+	
+		var doctor_socket = io.connect("http://localhost:5000/doctor")
+
+		doctor_socket.on("connect", () => {
+			console.log("[DOCTOR] Connected!")
+		})
+		doctor_socket.on("new_consultation_request", () => {
+			console.log("[DOCTOR] New consultation request")
+		})
+
+		doctor_socket.on("patient_data", (data) => {
+			console.log("[DOCTOR] patient data", data)
+		})
+
+	}
+)
+</script>
+</head>
+<body>
+
+</body>
+
+</html>

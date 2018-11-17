@@ -1,6 +1,23 @@
 from flask_ask import Ask, question, statement, session
-from aws import addConsultationRequest, addInformationRequest, findPatient, getPatientInfo, addDiagnosis
+from aws import addConsultationRequest, addInformationRequest, findPatient, getPatientInfo, addDiagnosis, getDiagnosis, getImageLink, getImageList
 from state import setLastPatientId
+
+def fixDecimal(x):
+    x["timestamp"] = int(x["timestamp"])
+    return x
+
+def getPatientData(patientId):
+        patientInfo = getPatientInfo(patientId)
+        images = getImageList(patientId)
+        diagnosis = getDiagnosis(patientId)
+        outputData = {
+                "id": patientInfo["patientId"],
+                "familyName": patientInfo["familyName"],
+                "givenName": patientInfo["givenName"],
+                "images": list(map(lambda x: getImageLink(x["s3Key"], x["s3Bucket"]), images)),
+                "diagnosis": list(map(fixDecimal, diagnosis))
+        }
+        return outputData
 
 def init(flaskApp, sio):
     ask = Ask(flaskApp, "/alexa")
@@ -15,6 +32,10 @@ def init(flaskApp, sio):
     userToDoctorMap = {
         
     }
+
+    def updatePatientData(patientId, ns):
+        sio.emit("patient_data", getPatientData(patientId), namespace=ns)
+
 
     def getPatientIdFromUser(userId):
         if userId not in userToPatientMap:
@@ -31,7 +52,9 @@ def init(flaskApp, sio):
 
     @ask.intent("ViewPatientDataIntent") # Alexa, show me my diagnosis
     def handleViewPatientIntent():
-        setLastPatientId(getPatientIdFromUser(session.user.userId))
+        patientId = getPatientIdFromUser(session.user.userId)
+        setLastPatientId(patientId)
+        updatePatientData(patientId, "/patient")
         return statement("Okay, I'm opening your patient data.")
 
     @ask.intent("VideoCallIntent")
@@ -42,20 +65,23 @@ def init(flaskApp, sio):
     def handleMessageIntent(message):
         addConsultationRequest(getPatientIdFromUser(session.user.userId), message)
         # TODO: send notification to doctor
+        sio.emit("new_consultation_request", None, namespace="/doctor")
         return statement("I have created a consultation request. A doctor will contact you shortly.")
 
     @ask.intent("ScheduleConsultationIntent")
     def handleCreateConsultationRequest(date):
         addConsultationRequest(getPatientIdFromUser(session.user.userId), "The patient has requested a consultation on " + str(date))
         # TODO: send notification to doctor
+        sio.emit("new_consultation_request", None, namespace="/doctor")
         return statement("I have created a consultation request on " + str(date) + ". A doctor will contact you shortly.")
 
     @ask.intent("RequestPictureIntent")
     def handleRequestInformationIntent():
         patientId = doctorState[session.user.userId]
-        patient = getPatientInfo(patientId)
         addInformationRequest(patientId)
         # todo send notification to patient
+        updatePatientData(patientId, "/patient")
+        sio.emit("new_picture_request", None, namespace="/patient")
         return statement("I have added an information request for " + str(patient["givenName"] + " " + str(patient["familyName"])))
 
     @ask.intent("GetInfoIntent")
@@ -66,6 +92,7 @@ def init(flaskApp, sio):
                 return statement("Sorry, I couldn't find " + str(name) + " in our database.")
         else:
                 doctorState[session.user.userId] = patient["patientId"]
+                updatePatientData(patient["patientId"], "/doctor")
                 return statement("Opening " + str(name) + "'s file.")
 
     @ask.intent("SendDiagnosisIntent")
@@ -73,6 +100,8 @@ def init(flaskApp, sio):
         patientId = doctorState[session.user.userId]
         patientInfo = getPatientInfo(patientId)
         addDiagnosis(patientId, message)
+        updatePatientData(patientId, "/patient")
+        sio.emit("new_diagnosis", None, namespace="/patient")
         return statement("Alright, I saved your diagnosis for " + patientInfo["givenName"] + " " + patientInfo["familyName"])
 
     @ask.intent("SendImageIntent")
