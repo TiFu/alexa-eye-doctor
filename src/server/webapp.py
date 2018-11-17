@@ -1,13 +1,9 @@
 from flask import Blueprint
-from aws import getPatientInfo, getImageList, getImageLink, getConsultationRequests, getDiagnosis
+from aws import getPatientInfo, getImageList, getImageLink, getConsultationRequests, getDiagnosis, findPatient
 import json
 from state import lastPatientId
 
 webapp_endpoints = Blueprint('webapp', __name__)
-
-@webapp_endpoints.route('/webapp')
-def show():
-    return "Hello Webapp"
 
 @webapp_endpoints.route("/info", methods=["GET"])
 def getInfoPatient():
@@ -16,7 +12,13 @@ def getInfoPatient():
 def fixDecimal(x):
     x["timestamp"] = int(x["timestamp"])
     return x
-    
+
+@webapp_endpoints.route("/info/name/<patientName>", methods=["GET"])
+def getInfoName(patientName):
+    split = patientName.split(" ")
+    patient = findPatient(split[0], split[1])
+    return getInfo(patient["patientId"])
+
 @webapp_endpoints.route("/info/<patientId>", methods=["GET"])
 def getInfo(patientId):
     patientInfo = getPatientInfo(patientId)
