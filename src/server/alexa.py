@@ -18,7 +18,7 @@ def init(flaskApp, sio):
     @ask.intent("ViewPatientDataIntent") # Alexa, show me my diagnosis
     def handleViewPatientIntent():
         setLastPatientId(userToPatientMap[session.user.userId])
-        
+        return statement("Okay, I'm opening your patient data.")
 
     @ask.intent("VideoCallIntent")
     def handleVideoCallIntent():
