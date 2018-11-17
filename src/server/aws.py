@@ -2,12 +2,14 @@ import boto3
 import json
 import os
 import uuid
+import time
 
 lambda_client = boto3.client('lambda', region_name="eu-west-1")
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource("dynamodb", region_name="eu-west-1")
 consulationRequestTable = dynamodb.Table("ConsultationRequest")
 infoRequestTable = dynamodb.Table("RequestInfo")
+diagnosisTable = dynamodb.Table("Diagnosis")
 
 def findPatient(givenName, fullName):
     patients = getPatientList()
@@ -38,9 +40,9 @@ def uploadImage(patientId, fileName, bucket="dr-cloud-128740296733-eu-west-1"):
     result = s3_client.upload_file(fileName, bucket, key)
 
 
-def addConsultationRequest(patientId):
+def addConsultationRequest(patientId, message = None):
     guid = uuid.uuid4()
-    consulationRequestTable.put_item(Item={"consultationId": str(guid), "patientId": patientId})
+    consulationRequestTable.put_item(Item={"consultationId": str(guid), "patientId": patientId, "message": message if not None else ""})
 
 def deleteConsultationRequests(consultationId):
     consulationRequestTable.delete_item(Key={"consultationId": consultationId})
@@ -58,9 +60,14 @@ def deleteInformationRequest(patientId):
 def getInformationRequest(patientId):
     return "Item" in infoRequestTable.get_item(Key={"patientId": str(patientId)})
 
+def addDiagnosis(patientId, diagnosis):
+    guid = uuid.uuid4()
+    diagnosisTable.put_item(Item={"timestamp": time.time(), diagnosisId": str(guid), "patientId": patientId, "diagnosis": diagnosis})
+
+def getDiagnosis(patientId):
+    return sorted(list(filter(lambda x: x["patientId"] == patientId, diagnosisTable.scan()["Items"])), key=lambda x: x["timestamp"])
+
 # defining the bucket like this is horrible - but hey it's a hackatohn
 # also not making the region a variable
 def getImageLink(key, bucket="dr-cloud-128740296733-eu-west-1"):
     return "https://s3-eu-west-1.amazonaws.com/" + bucket + "/" + key
-
-print(getInformationRequest("21c03410-ea14-11e8-badf-6542a9f38021"))
