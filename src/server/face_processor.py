@@ -10,7 +10,7 @@ class FaceProcessor:
     ERROR_BAD_IMAGE = 1
     ERROR_BAD_EYE = 2
 
-    __EYE_AR_THRESH = 0.3
+    __EYE_AR_THRESH = 0.15
     __EYE_AR_CONSEC_FRAMES = 3
 
     def __init__(self):
@@ -63,12 +63,14 @@ class FaceProcessor:
         right_eye_image_path: relative path to the left eye image (.jpg)
         """
 
-        image = cv2.imread(face_image_path)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-        rect = self.__detector(gray, 0)[0]
-        shape = self.__predictor(gray, rect)
-        shape = face_utils.shape_to_np(shape)
+        try:
+            image = cv2.imread(face_image_path)
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            rect = self.__detector(gray, 0)[0]
+            shape = self.__predictor(gray, rect)
+            shape = face_utils.shape_to_np(shape)
+        except:
+            return self.ERROR_BAD_IMAGE
 
         left_eye = shape[self.__lEyeStart:self.__lEyeEnd]
         right_eye = shape[self.__rEyeStart:self.__rEyeEnd]
