@@ -4,6 +4,9 @@ import json
 from state import lastPatientId
 
 webapp_endpoints = Blueprint('webapp', __name__)
+@webapp_endpoints.route("/webapp", methods=["GET"])
+def testWebapp():
+    return "Hello webapp"
 
 @webapp_endpoints.route("/info", methods=["GET"])
 def getInfoPatient():
