@@ -33,15 +33,20 @@
         showPatientList()
     })
 
+    function newConsultationRequestHandler() {
+        const options = {
+            body: "We received a new consultation request. Head over to the consultation overview to view it."
+        }
+        const n = new Notification("New Consultation Request", options)
+    }
+
     function registerDoctor() {
         var doctor_socket = io.connect(SERVER_URL + "/doctor")
 
         doctor_socket.on("connect", () => {
             console.log("[DOCTOR] Connected!")
         })
-        doctor_socket.on("new_consultation_request", () => {
-            console.log("[DOCTOR] New consultation request")
-        })
+        doctor_socket.on("new_consultation_request", newConsultationRequestHandler)
 
         doctor_socket.on("patient_data", (data) => {
             console.log("[DOCTOR] patient data", data)
@@ -81,7 +86,11 @@ function showPatientList() {
         updatePatientList(data)
     })
     .fail((xhr, textStatus, errorThrown) => {
-        // TODO: show error
+        const options = {
+            body: "Failed to receive patient list!"
+        }
+        const n = new Notification("Error: Failed to download patient list!", options)
+        
     })
 }
     </script>
