@@ -1,5 +1,6 @@
 from flask_ask import Ask, question, statement, session
 from aws import addConsultationRequest, addInformationRequest, findPatient, getPatientInfo, addDiagnosis
+from state import setLastPatientId
 
 def init(flaskApp, sio):
     ask = Ask(flaskApp, "/alexa")
@@ -11,8 +12,13 @@ def init(flaskApp, sio):
     }
 
     userToDoctorMap = {
-
+        
     }
+
+    @ask.intent("ViewPatientDataIntent") # Alexa, show me my diagnosis
+    def handleViewPatientIntent():
+        setLastPatientId(userToPatientMap[session.user.userId])
+        
 
     @ask.intent("VideoCallIntent")
     def handleVideoCallIntent():
