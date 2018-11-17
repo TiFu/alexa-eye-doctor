@@ -50,7 +50,7 @@ def uploadImageRequest():
     file.save(f)
     try:
         eyeData = faceProcessor.get_eye_data(f)
-    except Exception:
+    except Exception as e:
         return str(False)
     if eyeData == faceProcessor.ERROR_BAD_EYE:
         return str(False)

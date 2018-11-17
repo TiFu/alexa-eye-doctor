@@ -40,7 +40,6 @@ def uploadImage(patientId, fileName, s3Name, bucket="dr-cloud-128740296733-eu-we
     key = patientId.split("-")[0] + "/" + patientId + "/" + s3Name
     result = s3_client.upload_file(fileName, bucket, key)
 
-
 def addConsultationRequest(patientId, message = None):
     guid = uuid.uuid4()
     consulationRequestTable.put_item(Item={"consultationId": str(guid), "patientId": patientId, "message": message if not None else ""})
