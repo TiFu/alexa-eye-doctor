@@ -62,7 +62,7 @@ def getInformationRequest(patientId):
 
 def addDiagnosis(patientId, diagnosis):
     guid = uuid.uuid4()
-    diagnosisTable.put_item(Item={"timestamp": time.time(), diagnosisId": str(guid), "patientId": patientId, "diagnosis": diagnosis})
+    diagnosisTable.put_item(Item={"timestamp": time.time(), "diagnosisId": str(guid), "patientId": patientId, "diagnosis": diagnosis})
 
 def getDiagnosis(patientId):
     return sorted(list(filter(lambda x: x["patientId"] == patientId, diagnosisTable.scan()["Items"])), key=lambda x: x["timestamp"])
