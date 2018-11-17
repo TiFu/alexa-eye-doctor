@@ -4,7 +4,7 @@ import json
 from state import lastPatientId
 from face_processor import FaceProcessor
 import os
-
+from alexa import getPatientData
 faceProcessor = FaceProcessor()
 
 IMAGE_PATH = "images/"
@@ -16,7 +16,9 @@ def testWebapp():
 
 @webapp_endpoints.route("/patients", methods=["GET"])
 def getPatients():
-    return json.dumps(getPatientList())
+    patientList = getPatientList()
+    print(patientList)
+    return json.dumps(list(map(lambda x: getPatientData(x["patientId"]), patientList)))
 
 @webapp_endpoints.route("/info", methods=["GET"])
 def getInfoPatient():

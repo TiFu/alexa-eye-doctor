@@ -21,11 +21,98 @@
 
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="css/swiper.min.css">
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
 
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
+    <script>
+    SERVER_URL = "http://localhost:5000"
+    $(() => {
+        registerDoctor()
+        showPatientList()
+    })
+
+    function registerDoctor() {
+        var doctor_socket = io.connect(SERVER_URL + "/doctor")
+
+        doctor_socket.on("connect", () => {
+            console.log("[DOCTOR] Connected!")
+        })
+        doctor_socket.on("new_consultation_request", () => {
+            console.log("[DOCTOR] New consultation request")
+        })
+
+        doctor_socket.on("patient_data", (data) => {
+            console.log("[DOCTOR] patient data", data)
+        })
+    }
+
+function updatePatientList(data) {
+    data = JSON.parse(data)
+    patientList = data.map((x) => getPatientListEntry(x)).reduce((prev, next) => prev + next)
+    header = "<div class=\"section-heading\">"
+                + "<h2 class=\"entry-title\">Registered patients</h2>"
+                + "</div><!-- .section-heading -->"
+    show(header + patientList)
+}
+
+function show(html) {
+    console.log("Showing content: ", html)
+    $("#content").html(html)
+}
+
+function getPatientListEntry(entry) {
+    let images = entry["images"].filter((x) => x.endsWith("face.jpg"));
+    let image = "";
+    if (images.length >= 1) {
+        image = images[0]
+    }
+    return $("#patientEntry")
+                .html().replace(/{name}/g, entry["givenName"] + " " + entry["familyName"])
+                .replace(/{birthdate}/g, entry["birthdate"])
+                .replace(/{location}/g, entry["location"].replace("\n", "<br />"))
+                .replace(/{image}/g, image)
+}
+
+function showPatientList() {
+    console.log("Sending request!", SERVER_URL + "/api/patients")
+    $.get(SERVER_URL + "/api/patients").done((data, status, jqHxr) => {
+        updatePatientList(data)
+    })
+    .fail((xhr, textStatus, errorThrown) => {
+        // TODO: show error
+    })
+}
+    </script>
 </head>
 <body>
+    <div id="patientEntry" style="display: none">
+        <div class="event-wrap d-flex flex-wrap justify-content-between">
+            <figure class="m-0">
+                <img src="{image}" alt="">
+            </figure>
+
+            <div class="event-content-wrap">
+                <header class="entry-header d-flex flex-wrap align-items-center">
+                    <h3 class="entry-title w-100 m-0"><a href="#">{name}</a></h3>
+
+                    <div class="posted-date">
+                        <a href="#">{birthdate}</a>
+                    </div><!-- .posted-date -->
+
+                </header><!-- .entry-header -->
+
+                <div class="entry-content">
+                    {location}    
+                </div><!-- .entry-content -->
+
+                <div class="entry-footer">
+                    <a href="#">Get medical records</a>
+                </div><!-- .entry-footer -->
+            </div><!-- .event-content-wrap -->
+        </div><!-- .event-wrap -->
+    </div>
     <header class="site-header">
         <div class="nav-bar">
             <div class="container">
@@ -62,94 +149,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-6">
-                    <div class="upcoming-events">
+                    <div class="upcoming-events" id="content">
                         <div class="section-heading">
                             <h2 class="entry-title">Registered patients</h2>
                         </div><!-- .section-heading -->
-
-                        <div class="event-wrap d-flex flex-wrap justify-content-between">
-                            <figure class="m-0">
-                                <img src="images/event-1.jpg" alt="">
-                            </figure>
-
-                            <div class="event-content-wrap">
-                                <header class="entry-header d-flex flex-wrap align-items-center">
-                                    <h3 class="entry-title w-100 m-0"><a href="#">Fundraiser for Kids</a></h3>
-
-                                    <div class="posted-date">
-                                        <a href="#">Aug 25, 2018 </a>
-                                    </div><!-- .posted-date -->
-
-                                    <div class="cats-links">
-                                        <a href="#">Ball Room New York</a>
-                                    </div><!-- .cats-links -->
-                                </header><!-- .entry-header -->
-
-                                <div class="entry-content">
-                                    <p class="m-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tempus vestib ulum mauris.</p>
-                                </div><!-- .entry-content -->
-
-                                <div class="entry-footer">
-                                    <a href="#">Get medical records</a>
-                                </div><!-- .entry-footer -->
-                            </div><!-- .event-content-wrap -->
-                        </div><!-- .event-wrap -->
-
-                        <div class="event-wrap d-flex flex-wrap justify-content-between">
-                            <figure class="m-0">
-                                <img src="images/event-2.jpg" alt="">
-                            </figure>
-
-                            <div class="event-content-wrap">
-                                <header class="entry-header d-flex flex-wrap align-items-center">
-                                    <h3 class="entry-title w-100 m-0"><a href="#">Bring water to the childrens</a></h3>
-
-                                    <div class="posted-date">
-                                        <a href="#">Aug 25, 2018 </a>
-                                    </div><!-- .posted-date -->
-
-                                    <div class="cats-links">
-                                        <a href="#">Ball Room New York</a>
-                                    </div><!-- .cats-links -->
-                                </header><!-- .entry-header -->
-
-                                <div class="entry-content">
-                                    <p class="m-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tempus vestib ulum mauris.</p>
-                                </div><!-- .entry-content -->
-
-                                <div class="entry-footer">
-                                    <a href="#">Get medical records</a>
-                                </div><!-- .entry-footer -->
-                            </div><!-- .event-content-wrap -->
-                        </div><!-- .event-wrap -->
-
-                        <div class="event-wrap d-flex flex-wrap justify-content-between">
-                            <figure class="m-0">
-                                <img src="images/event-3.jpg" alt="">
-                            </figure>
-
-                            <div class="event-content-wrap">
-                                <header class="entry-header d-flex flex-wrap align-items-center">
-                                    <h3 class="entry-title w-100 m-0"><a href="#">Bring water to the childrens</a></h3>
-
-                                    <div class="posted-date">
-                                        <a href="#">Aug 25, 2018 </a>
-                                    </div><!-- .posted-date -->
-
-                                    <div class="cats-links">
-                                        <a href="#">Ball Room New York</a>
-                                    </div><!-- .cats-links -->
-                                </header><!-- .entry-header -->
-
-                                <div class="entry-content">
-                                    <p class="m-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tempus vestib ulum mauris.</p>
-                                </div><!-- .entry-content -->
-
-                                <div class="entry-footer">
-                                    <a href="#">Get medical records</a>
-                                </div><!-- .entry-footer -->
-                            </div><!-- .event-content-wrap -->
-                        </div><!-- .event-wrap -->
                     </div><!-- .upcoming-events -->
                 </div><!-- .col -->
             </div><!-- .row -->

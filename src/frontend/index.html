@@ -8,6 +8,8 @@
 	<link rel="icon" href="img/favicon.png" type="image/png">
 	<title>Kare Charity</title>
 	<!-- Bootstrap CSS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+
 	<link rel="stylesheet" href="css/bootstrap.css">
 	<link rel="stylesheet" href="vendors/linericon/style.css">
 	<link rel="stylesheet" href="css/font-awesome.min.css">
@@ -19,6 +21,76 @@
 	<!-- main css -->
 	<link rel="stylesheet" href="css/style.css">
 	<link rel="stylesheet" href="css/responsive.css">
+	<script>
+		SERVER_URL = "http://localhost:5000"
+
+		function registerPatient() {
+			var patient_socket = io.connect("http://localhost:5000/patient")
+			patient_socket.on("connect", () => {
+				console.log("[PATIENT] Connected to server!")
+			})
+
+			patient_socket.on("patient_data", (data) => {
+				console.log("[PATIENT] Data: ", data)
+			})
+
+			patient_socket.on("new_diagnosis", () => {
+				console.log("[PATIENT] New Diagnosis ");
+			})
+
+			patient_socket.on("new_picture_request", () => {
+				console.log("[PATIENT] new picture request");
+			});
+		}
+
+		function registerDoctor() {
+			var doctor_socket = io.connect("http://localhost:5000/doctor")
+
+			doctor_socket.on("connect", () => {
+				console.log("[DOCTOR] Connected!")
+			})
+			doctor_socket.on("new_consultation_request", () => {
+				console.log("[DOCTOR] New consultation request")
+			})
+
+			doctor_socket.on("patient_data", (data) => {
+				console.log("[DOCTOR] patient data", data)
+			})
+		}
+
+		function handleAmDoctor() {
+			registerDoctor()
+			showPatientList()
+		}
+
+		function handleAmPatient() {
+			registerPatient()
+
+		}
+
+		function updatePatientList(data) {
+			data = JSON.parse(data)
+			patientList = data.map((x) => getPatientListEntry(x)).reduce((prev, next) => prev + next)
+			show(patientList)
+		}
+
+		function show(html) {
+			$("#content").html(patientList)
+		}
+
+		function getPatientListEntry(entry) {
+			return "<div>Patinet A</div>"
+		}
+
+		function showPatientList() {
+			console.log("Sending request!", SERVER_URL + "/api/patients")
+			$.get(SERVER_URL + "/api/patients").done((data, status, jqHxr) => {
+				updatePatientList(data)
+			})
+			.fail((xhr, textStatus, errorThrown) => {
+			})
+		}
+	</script>
 </head>
 
 <body>
@@ -95,21 +167,170 @@
 	<!--================Header Menu Area =================-->
 
 	<!--================ Home Banner Area =================-->
-	<section class="home_banner_area">
+	<section class="home_banner_area" id="content">
 		<div class="overlay"></div>
 		<div class="banner_inner d-flex align-items-center">
 			<div class="container">
 				<div class="banner_content row">
 					<div class="offset-lg-2 col-lg-8">
 						<!--<img class="img-fluid" src="img/banner/text-img.png" alt="">-->
-						<a class="main_btn mr-10" href="#">I am a patient</a>
-						<a class="white_bg_btn" href="#">I am a doctor</a>
+						<a class="main_btn mr-10" href="#" onclick="handleAmPatient()">I am a patient</a>
+						<a class="white_bg_btn" href="#" onclick="handleAmDoctor()">I am a doctor</a>
 					</div>
 				</div>
 			</div>
 		</div>
 	</section>
 	<!--================ End Home Banner Area =================-->
+
+	<!--================ Start Our Major Cause section =================-->
+	<section class="our_major_cause section_gap_custom" style="display:hidden">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="card">
+							<div class="card-body">
+								<figure>
+									<img class="card-img-top img-fluid" src="img/people_images/hipster.png" alt="Card image cap">
+									<span>Name: John; Age: 32</span>
+								</figure>
+								<div class="progress">
+									<div class="progress-bar color-9" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+										<span><a href="#">view details</a></span>
+									</div>
+								</div>
+								<div class="card_inner_body">
+									<div class="card-body-top">
+										<span>Last updated: </span>Nov.15,2018
+									</div>
+									<h4 class="card-title">Doctor diagnosis</h4>
+									<p class="card-text">The pseudo diagonsis.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+	
+						<div class="col-lg-4">
+							<div class="card">
+								<div class="card-body">
+									<figure>
+										<img class="card-img-top img-fluid" src="img/people_images/modern-2.png" alt="Card image cap" width="12", height="12">
+										<span>Name: Emma; Age: 27</span>
+									</figure>
+									<div class="progress">
+										<div class="progress-bar color-9" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+											<span><a href="#">view details</a></span>
+										</div>
+									</div>
+									<div class="card_inner_body">
+										<div class="card-body-top">
+											<span>Last updated: </span>Oct.20,2018
+										</div>
+										<h4 class="card-title">Doctor diagnosis</h4>
+										<p class="card-text">The pseudo diagonsis.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+	
+					<div class="col-lg-4">
+						<div class="card">
+							<div class="card-body">
+								<figure>
+									<img class="card-img-top img-fluid" src="img/people_images/modern-3.png" alt="Card image cap" width="12", height="12">
+									<span>Name: Michael; Age: 22</span>
+								</figure>
+								<div class="progress">
+									<div class="progress-bar color-9" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+										<span><a href="#">view details</a></span>
+									</div>
+								</div>
+								<div class="card_inner_body">
+									<div class="card-body-top">
+										<span>Last updated: </span>Oct.20,2018
+									</div>
+									<h4 class="card-title">Doctor diagnosis</h4>
+									<p class="card-text">The pseudo diagonsis.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+	
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="card">
+							<div class="card-body">
+								<figure>
+									<img class="card-img-top img-fluid" src="img/people_images/modern.png" alt="Card image cap" width="12", height="12">
+									<span>Name: Georg; Age: 43</span>
+								</figure>
+								<div class="progress">
+									<div class="progress-bar color-9" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+										<span><a href="#">view details</a></span>
+									</div>
+								</div>
+								<div class="card_inner_body">
+									<div class="card-body-top">
+										<span>Last updated: </span>Oct.20,2018
+									</div>
+									<h4 class="card-title">Doctor diagnosis</h4>
+									<p class="card-text">The pseudo diagonsis.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+	
+					<div class="col-lg-4">
+						<div class="card">
+							<div class="card-body">
+								<figure>
+									<img class="card-img-top img-fluid" src="img/people_images/modern-3.png" alt="Card image cap" width="12", height="12">
+									<span>Name: Michael; Age: 22</span>
+								</figure>
+								<div class="progress">
+									<div class="progress-bar color-9" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+										<span><a href="#">view details</a></span>
+									</div>
+								</div>
+								<div class="card_inner_body">
+									<div class="card-body-top">
+										<span>Last updated: </span>Oct.20,2018
+									</div>
+									<h4 class="card-title">Doctor diagnosis</h4>
+									<p class="card-text">The pseudo diagonsis.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+	
+					<div class="col-lg-4">
+						<div class="card">
+							<div class="card-body">
+								<figure>
+									<img class="card-img-top img-fluid" src="img/people_images/hipster.png" alt="Card image cap">
+									<span>Name: John; Age: 32</span>
+								</figure>
+								<div class="progress">
+									<div class="progress-bar color-9" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+										<span><a href="#">view details</a></span>
+									</div>
+								</div>
+								<div class="card_inner_body">
+									<div class="card-body-top">
+										<span>Last updated: </span>Nov.15,2018
+									</div>
+									<h4 class="card-title">Doctor diagnosis</h4>
+									<p class="card-text">The pseudo diagonsis.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!--================ Ens Our Major Cause section =================-->
+		
 
 	<!--================ Start Footer Area  =================-->
 	<footer class="footer-area section_gap">
