@@ -60,11 +60,28 @@ def addConsultationRequest(patientId, message = None):
     guid = uuid.uuid4()
     consulationRequestTable.put_item(Item={"consultationId": str(guid), "patientId": patientId, "message": message if not None else ""})
 
+def getConsultationRequests():
+    consultations = consulationRequestTable.scan()["Items"]
+    patients = set()
+    for consultation in consultations:
+        patients.add(consultation["patientId"])
+
+    patientInfos = {}
+        
+    for patient in patients:
+        patientInfos[patient] = getPatientInfo(patient)
+        images = getImageList(patient)
+        for image in images:
+            if image["fileName"] == "face.jpg":
+                patientInfos[patient]["image"] = getImageLink(image["s3Key"])
+
+    return {
+        "consultations": consultations,
+        "patients": patientInfos
+    }
+
 def deleteConsultationRequests(consultationId):
     consulationRequestTable.delete_item(Key={"consultationId": consultationId})
-
-def getConsultationRequests():
-    return consulationRequestTable.scan()["Items"]
 
 def addInformationRequest(patientId):
     infoRequestTable.put_item(Item={"patientId": str(patientId)})

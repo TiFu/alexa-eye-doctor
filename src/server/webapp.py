@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from aws import getPatientList ,getPatientInfo, updatePatientEyeColor, getImageList, getImageLink, getConsultationRequests, getDiagnosis, findPatient, uploadImage
+from aws import getPatientList ,getPatientInfo, getConsultationRequests, updatePatientEyeColor, getImageList, getImageLink, getDiagnosis, findPatient, uploadImage
 import json
 from state import lastPatientId
 from face_processor import FaceProcessor
@@ -47,6 +47,11 @@ def getInfo(patientId):
         "diagnosis": list(map(fixDecimal, diagnosis))
     })
 
+@webapp_endpoints.route("/consultations", methods=["GET"])
+def fetchConsultations():
+    return json.dumps(getConsultationRequests())
+
+
 import uuid
 
 @webapp_endpoints.route("/uploadImage", methods=["POST"])
@@ -70,13 +75,4 @@ def uploadImageRequest():
         updatePatientEyeColor(lastPatientId, eyeData[2])
         return str(True)
     
-
-
-@webapp_endpoints.route("/consultations", methods=["GET"])
-def get_ConsultationRequests():
-    requests = getConsultationRequests()
-    
-    return json.dumps(
-            list(map(lambda x: getPatientInfo(x["patientId"]), requests))
-    )
     

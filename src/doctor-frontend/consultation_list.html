@@ -1,0 +1,208 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Diagnose - consultation list</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- FontAwesome CSS -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+
+    <!-- ElegantFonts CSS -->
+    <link rel="stylesheet" href="css/elegant-fonts.css">
+
+    <!-- themify-icons CSS -->
+    <link rel="stylesheet" href="css/themify-icons.css">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="css/swiper.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+    <script>
+            SERVER_URL = "http://localhost:5000"
+            $(() => {
+                registerDoctor()
+                showPatientList()
+            })
+        
+            function newConsultationRequestHandler() {
+                console.log("received new consultation request handler")
+                const options = {
+                    body: "We received a new consultation request. Head over to the consultation overview to view it."
+                }
+                new Noty({ type: 'info',
+    layout: 'topRight', text: "New Consultation Request" }).show()
+                const n = new Notification("New Consultation Request", options)
+            }
+        
+            function registerDoctor() {
+                var doctor_socket = io.connect(SERVER_URL + "/doctor")
+        
+                doctor_socket.on("connect", () => {
+                    console.log("[DOCTOR] Connected!")
+                })
+                doctor_socket.on("new_consultation_request", newConsultationRequestHandler)
+        
+                doctor_socket.on("show_consultation_list", () => {
+                    window.location.href="./consultation_list.html"
+                })
+
+                doctor_socket.on("show_patient_list", () => {
+                    //window.location.href="./patient_list.html"
+                })
+
+                doctor_socket.on("patient_data", (data) => {
+                    console.log("[DOCTOR] patient data", data)
+                })
+            }
+        
+        function updatePatientList(data) {
+            data = JSON.parse(data)
+            patientList = data["consultations"].map((x) => getPatientListEntry(x, data["patients"][x["patientId"]])).reduce((prev, next) => prev + next)
+            header = "<div class=\"section-heading\">"
+                        + "<h2 class=\"entry-title\">Requested Consultations</h2>"
+                        + "</div><!-- .section-heading -->"
+            show(header + patientList)
+        }
+        
+        function show(html) {
+            $("#content").html(html)
+        }
+        
+        function getPatientListEntry(entry, person) {
+            let image = person["image"]
+            return $("#patientEntry")
+                        .html().replace(/{name}/g, person["givenName"] + " " + person["familyName"])
+                        .replace(/{birthdate}/g, person["birthdate"])
+                        .replace(/{location}/g, (entry["message"] || " ").replace("\n", "<br />"))
+                        .replace(/{image}/g, image)
+        }
+        
+        function showPatientList() {
+            console.log("Sending request!", SERVER_URL + "/api/consultations")
+            $.get(SERVER_URL + "/api/consultations").done((data, status, jqHxr) => {
+                console.log("got result!")
+                updatePatientList(data)
+            })
+            .fail((xhr, textStatus, errorThrown) => {
+                const options = {
+                    body: "Failed to receive consultation list!"
+                }
+                new Noty({ type: 'alert',
+    layout: 'topRight',text: "Error: Failed to download consultation list" }).show()
+                const n = new Notification("Error: Failed to download consultation list!", options)
+                
+            })
+        }
+    </script>
+
+    <!-- Icon -->
+    <link rel="shortcut icon" href="img/Logo.ico">
+
+</head>
+<body>
+    <div id="patientEntry" style="display: none">
+            <div class="event-wrap d-flex flex-wrap justify-content-between">
+                <figure class="m-0">
+                    <img src="{image}" alt="">
+                </figure>
+    
+                <div class="event-content-wrap">
+                    <header class="entry-header d-flex flex-wrap align-items-center">
+                        <h3 class="entry-title w-100 m-0"><a href="#">{name}</a></h3>
+    
+                        <div class="posted-date">
+                            <a href="#">{birthdate}</a>
+                        </div><!-- .posted-date -->
+    
+                    </header><!-- .entry-header -->
+    
+                    <div class="entry-content">
+                        {location}    
+                    </div><!-- .entry-content -->
+    
+                    <div class="entry-footer">
+                        <a href="#">Get medical records</a>
+                    </div><!-- .entry-footer -->
+                </div><!-- .event-content-wrap -->
+            </div><!-- .event-wrap -->
+        </div>
+    <header class="site-header">
+        <div class="nav-bar">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 d-flex flex-wrap justify-content-between align-items-center">
+                        <div class="site-branding d-flex align-items-center">
+                            <a class="d-block" href="patient_list.html" rel="home"><img class="d-block" src="img/Logo.ico" alt="logo"></a>
+                        </div><!-- .site-branding -->
+
+                        <nav class="site-navigation d-flex justify-content-end align-items-center">
+                            <ul class="d-flex flex-column flex-lg-row justify-content-lg-end align-content-center">
+                                <li><a href="patient_list.html">Patient List</a></li>
+                                <li class="current-menu-item"><a href=#>Consultation List</a></li>
+                            </ul>
+                        </nav><!-- .site-navigation -->
+
+                        <div class="hamburger-menu d-lg-none">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div><!-- .hamburger-menu -->
+                    </div><!-- .col -->
+                </div><!-- .row -->
+            </div><!-- .container -->
+        </div><!-- .nav-bar -->
+    </header><!-- .site-header -->
+
+    <div class="home-page-events">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <div class="upcoming-events" id="content">
+                        <div class="section-heading">
+                            <h2 class="entry-title">Registered Consultations</h2>
+
+                            <div style="padding-top:50px">
+                                <div class="loader" style="margin:auto;"></div> 
+                            </div>
+                        </div><!-- .section-heading -->
+                    </div><!-- .upcoming-events -->
+                </div><!-- .col -->
+            </div><!-- .row -->
+        </div><!-- .container -->
+    </div><!-- .home-page-events -->
+
+    <footer class="site-footer">
+        <div class="footer-bar">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <p class="m-0">Made by Icebox</p>
+                    </div><!-- .col-12 -->
+                </div><!-- .row -->
+            </div><!-- .container -->
+        </div><!-- .footer-bar -->
+    </footer><!-- .site-footer -->
+
+    <script type='text/javascript' src='js/jquery.js'></script>
+    <script type='text/javascript' src='js/jquery.collapsible.min.js'></script>
+    <script type='text/javascript' src='js/swiper.min.js'></script>
+    <script type='text/javascript' src='js/jquery.countdown.min.js'></script>
+    <script type='text/javascript' src='js/circle-progress.min.js'></script>
+    <script type='text/javascript' src='js/jquery.countTo.min.js'></script>
+    <script type='text/javascript' src='js/jquery.barfiller.js'></script>
+    <script type='text/javascript' src='js/custom.js'></script>
+
+</body>
+</html>
