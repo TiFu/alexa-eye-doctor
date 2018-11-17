@@ -33,16 +33,17 @@ def createPatient(givenName, familyName):
     result = lambda_client.invoke(FunctionName="dr-cloud-patient-service", Payload=json.dumps({ "action": "create", "body": { "givenName": givenName, "familyName": familyName}}))
     return json.loads(result["Payload"].read().decode())
 
+from decimal import Decimal
 def updatePatientEyeColor(patientId, eyeColor):
-    response = table.update_item(
+    response = patientTable.update_item(
         Key={
             'patientId': patientId,
         },
         UpdateExpression="set EyeColorBlue = :bl, EyeColorBrown = :br, EyeColorGreen = :g",
         ExpressionAttributeValues={
-            ':bl': eyeColor["blue"],
-            ':br': eyeColor["brown"],
-            ':g': eyeColor["green"]
+            ':bl': Decimal(eyeColor["blue"]) * 100,
+            ':br': Decimal(eyeColor["brown"]) * 100,
+            ':g': Decimal(eyeColor["green"]) * 100
         },
         ReturnValues="UPDATED_NEW"
     )    

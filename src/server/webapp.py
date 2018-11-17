@@ -54,8 +54,10 @@ def uploadImageRequest():
     file = request.files["image"]
     f = os.path.join(IMAGE_PATH, lastPatientId + ".jpg")
     file.save(f)
+    print("Saving image file")
     try:
         eyeData = faceProcessor.get_eye_data(f)
+        print("got eye data: " + str(eyeData))
     except Exception as e:
         return str(False)
     if eyeData == faceProcessor.ERROR_BAD_EYE:
@@ -64,6 +66,7 @@ def uploadImageRequest():
         uploadImage(lastPatientId, eyeData[0], IMAGE_PATH + "/leftEye_" + str(uuid.uuid4()) + ".jpg")
         uploadImage(lastPatientId, eyeData[1], IMAGE_PATH + "/rightEye_" + str(uuid.uuid4()) + ".jpg")
         uploadImage(lastPatientId, f, "face.jpg")
+        print(eyeData[2])
         updatePatientEyeColor(lastPatientId, eyeData[2])
         return str(True)
     
