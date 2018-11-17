@@ -1,11 +1,13 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from aws import getPatientInfo, getImageList, getImageLink, getConsultationRequests, getDiagnosis, findPatient, uploadImage
 import json
 from state import lastPatientId
-#from face_processor import FaceProcessor
-#faceProcessor = FaceProcessor()
+from face_processor import FaceProcessor
+import os
 
-IMAGE_PATH = "./images/"
+faceProcessor = FaceProcessor()
+
+IMAGE_PATH = "images/"
 
 webapp_endpoints = Blueprint('webapp', __name__)
 @webapp_endpoints.route("/webapp", methods=["GET"])
@@ -41,19 +43,22 @@ def getInfo(patientId):
 
 import uuid
 
-#@webapp_endpoints.route("/uploadImage", methods=["POST"])
-#def uploadImage():
-#    file = request.files["image"]
-#    f = os.path.join(IMAGE_PATH, lastPatientId + ".jpg")
-#    file.save(f)
-#    eyeData = faceProcessor.get_eye_data(f)
-#    if eyeData == faceProcessor.ERROR_BAD_EYE:
-#        return False
-#    else:
-#        uploadImage(lastPatientId, eyeData[0], "leftEye_" + str(uuid.uuid4()))
-#        uploadImage(lastPatientId, eyeData[1], "rightEye_" + str(uuid.uuid4()))
-#        uploadImage(lastPatientId, f, "face")
-#        return True
+@webapp_endpoints.route("/uploadImage", methods=["POST"])
+def uploadImageRequest():
+    file = request.files["image"]
+    f = os.path.join(IMAGE_PATH, lastPatientId + ".jpg")
+    file.save(f)
+    try:
+        eyeData = faceProcessor.get_eye_data(f)
+    except Exception:
+        return str(False)
+    if eyeData == faceProcessor.ERROR_BAD_EYE:
+        return str(False)
+    else:
+        uploadImage(lastPatientId, eyeData[0], IMAGE_PATH + "/leftEye_" + str(uuid.uuid4()) + ".jpg")
+        uploadImage(lastPatientId, eyeData[1], IMAGE_PATH + "/rightEye_" + str(uuid.uuid4()) + ".jpg")
+        uploadImage(lastPatientId, f, "face.jpg")
+        return str(True)
     
 
 
