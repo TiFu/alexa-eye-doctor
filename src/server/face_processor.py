@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 import dlib
 import cv2
 import matplotlib.pyplot as plt
@@ -16,9 +17,27 @@ class FaceProcessor:
     def __init__(self):
         self.__detector = dlib.get_frontal_face_detector()
         self.__predictor = dlib.shape_predictor("res/face_detector.dat")
+        with open('res/eye_color_classifier.pkl', 'rb') as f:
+            self.__eye_color_predictor = pickle.load(f)
 
         (self.__lEyeStart, self.__lEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (self.__rEyeStart, self.__rEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+
+    def __increase_image_brightness(self, image, value):
+        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv)
+
+        cur_brightness = np.mean(v)
+
+        if cur_brightness < value:
+            diff = int(value - cur_brightness)
+            lim = 255 - diff
+            v[v > lim] = 255
+            v[v <= lim] += diff
+
+        final_hsv = cv2.merge((h, s, v))
+        image = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+        return image
 
     def __eye_closed(self, eye_coord):
         a = dist.euclidean(eye_coord[1], eye_coord[5])
@@ -32,7 +51,11 @@ class FaceProcessor:
 
         return False
 
-    def __crop_image_by_mask(self, mask, image):
+    def __crop_eye_by_eye_hull(self, hull, image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        mask = np.zeros_like(gray)
+        cv2.drawContours(mask, [hull], -1, 255, -1)
+
         out = np.zeros_like(image)
         (x, y) = np.where(mask == 255)
 
@@ -49,6 +72,43 @@ class FaceProcessor:
 
         return out[top_x:bottom_x, top_y:bottom_y]
 
+    def __crop_iris_by_eye_hull(self, hull, image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        mask = np.zeros_like(gray)
+
+        cv2.drawContours(mask, [np.vstack([hull[1], hull[2], hull[4], hull[5]])], -1, 255, -1)
+
+        out = np.zeros_like(image)
+        (x, y) = np.where(mask == 255)
+
+        (topx, topy) = (np.min(x), np.min(y))
+        (bottomx, bottomy) = (np.max(x), np.max(y))
+
+        for x in range(topx, bottomx + 1):
+            for y in range(topy, bottomy + 1):
+                if mask[x][y] == 255:
+                    out[x][y] = image[x][y]
+
+        return out[topx:bottomx + 1, topy:bottomy + 1]
+
+    def __get_iris_color(self, eye):
+        Z = eye.reshape((-1, 3))
+        Z = np.float32(Z)
+
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+        K = 4
+        ret, label, center = cv2.kmeans(Z, K, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+
+        center = np.uint8(center)
+        res = center[label.flatten()]
+        res2 = res.reshape((eye.shape))
+
+        unique, counts = np.unique(label, return_counts=True)
+        clusters = sorted(np.asarray((unique, counts)).T.tolist(), key=lambda x: -x[1])
+        top_cluster = clusters[1][0] if center[clusters[0][0]].mean() < 10 else clusters[0][0]
+
+        return center[top_cluster][::-1]
+
     def get_eye_data(self, face_image_path):
         """
         Args:
@@ -63,14 +123,13 @@ class FaceProcessor:
         right_eye_image_path: relative path to the left eye image (.jpg)
         """
 
-        try:
-            image = cv2.imread(face_image_path)
-            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            rect = self.__detector(gray, 0)[0]
-            shape = self.__predictor(gray, rect)
-            shape = face_utils.shape_to_np(shape)
-        except:
-            return self.ERROR_BAD_IMAGE
+        image = cv2.imread(face_image_path)
+        image_brightened = self.__increase_image_brightness(image, 150)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        rect = self.__detector(gray, 0)[0]
+        shape = self.__predictor(gray, rect)
+        shape = face_utils.shape_to_np(shape)
 
         left_eye = shape[self.__lEyeStart:self.__lEyeEnd]
         right_eye = shape[self.__rEyeStart:self.__rEyeEnd]
@@ -81,13 +140,8 @@ class FaceProcessor:
         left_eye_hull = cv2.convexHull(left_eye)
         right_eye_hull = cv2.convexHull(right_eye)
 
-        mask = np.zeros_like(gray)
-        cv2.drawContours(mask, [left_eye_hull], -1, 255, -1)
-        left_eye = self.__crop_image_by_mask(mask, image)
-
-        mask = np.zeros_like(gray)
-        cv2.drawContours(mask, [right_eye_hull], -1, 255, -1)
-        right_eye = self.__crop_image_by_mask(mask, image)
+        left_eye = self.__crop_eye_by_eye_hull(left_eye_hull, image)
+        right_eye = self.__crop_eye_by_eye_hull(right_eye_hull, image)
 
         original_image_name = face_image_path[:face_image_path.find('.')]
         left_eye_image_location = original_image_name + '_left_eye.jpg'
@@ -96,4 +150,19 @@ class FaceProcessor:
         cv2.imwrite(left_eye_image_location, left_eye)
         cv2.imwrite(right_eye_image_location, right_eye)
 
-        return [left_eye_image_location, right_eye_image_location]
+        ### Get eye color
+        left_eye = self.__crop_iris_by_eye_hull(left_eye_hull, image_brightened)
+        right_eye = self.__crop_iris_by_eye_hull(right_eye_hull, image_brightened)
+
+        left_iris_color = self.__get_iris_color(left_eye)
+        right_iris_color = self.__get_iris_color(right_eye)
+        iris_color = (left_iris_color.astype(np.int) + right_iris_color.astype(np.int)) / 2
+
+        iris_color_proba = self.__eye_color_predictor.predict_proba([iris_color])
+        color_proba = {
+            "green": round(iris_color_proba[0][0], 2),
+            "blue": round(iris_color_proba[0][1], 2),
+            "brown": round(iris_color_proba[0][2], 2)
+        }
+
+        return [left_eye_image_location, right_eye_image_location, color_proba]
