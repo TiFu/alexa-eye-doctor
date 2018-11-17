@@ -4,5 +4,10 @@ def init(flaskApp):
     ask = Ask(flaskApp, "/alexa")
 
     @ask.intent("SendImageIntent")
-    def testIntent():
+    def handleSendImageIntent():
         return statement("Hello my friend!")
+
+
+    @ask.intent("ConsultationIntent")
+    def handleConsultationIntent():
+        return statement("Hello World")

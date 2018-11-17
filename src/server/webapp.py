@@ -8,5 +8,5 @@ def show():
 
 @webapp_endpoints.route("/info/<name>", methods=["GET"])
 def getInfo(name):
-    pass
+    
 
