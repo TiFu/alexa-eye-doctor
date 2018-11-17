@@ -63,9 +63,4 @@ def init(flaskApp, sio):
 
     @ask.intent("SendImageIntent")
     def handleSendImageIntent():
-        return statement("Hello my friend!")
-
-
-    @ask.intent("ConsultationIntent")
-    def handleConsultationIntent():
-        return statement("Hello World")
+        return statement("The images were sent successfully!")
