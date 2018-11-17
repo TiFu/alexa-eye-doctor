@@ -1,5 +1,5 @@
 from flask import Blueprint
-from aws import getPatientInfo, getImageList, getImageLink
+from aws import getPatientInfo, getImageList, getImageLink, getConsultationRequests
 import json
 
 webapp_endpoints = Blueprint('webapp', __name__)
@@ -21,3 +21,12 @@ def getInfo(patientId):
         "givenName": patientInfo["givenName"],
         "images": list(map(lambda x: getImageLink(x["s3Key"], x["s3Bucket"]), images))
     })
+
+@webapp_endpoints.route("/consultations", methods=["GET"])
+def get_ConsultationRequests():
+    requests = getConsultationRequests()
+    
+    return json.dumps(
+            list(map(lambda x: getPatientInfo(x["patientId"]), requests))
+    )
+    
