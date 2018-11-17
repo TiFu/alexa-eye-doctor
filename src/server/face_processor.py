@@ -115,12 +115,14 @@ class FaceProcessor:
         image_path: relative path to the face image (.jpg)
 
         Returns:
-        [left_eye_image_path, right_eye_image_path]
+        [left_eye_image_path, right_eye_image_path, color_probability]
 
         Images are stored in the same directory named like the original image name with suffixes appended.
 
         left_eye_image_path: relative path to the left eye image (.jpg)
         right_eye_image_path: relative path to the left eye image (.jpg)
+        color_probability: a dictionary with keys ["blue", "brown", "green"] and a float probability in range [0;1]
+        for eye iris being that color
         """
 
         image = cv2.imread(face_image_path)
