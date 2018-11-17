@@ -1,11 +1,12 @@
 from flask import Flask
 from config import config
+import sio_impl
 import alexa
 from webapp import webapp_endpoints
 
 app = Flask(__name__)
 app.register_blueprint(webapp_endpoints, url_prefix='/api')
-sio = socketio.init(app)
+sio = sio_impl.init(app)
 alexa.init(app, sio)
 
 if __name__ == "__main__":

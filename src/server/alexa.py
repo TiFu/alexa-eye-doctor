@@ -1,6 +1,7 @@
 from flask_ask import Ask, question, statement
+from aws import getPatientList
 
-def init(flaskApp):
+def init(flaskApp, sio):
     ask = Ask(flaskApp, "/alexa")
 
     @ask.intent("SendImageIntent")
