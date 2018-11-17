@@ -886,7 +886,7 @@ ul.tabs-nav .tab-nav.active {
     right: 0;
     width: 1px;
     height: 100%;
-    background: #262626;
+    background: white;
 }
 
 .event-content-wrap .entry-content {
