@@ -21,13 +21,12 @@
 
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="css/swiper.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.css">
 
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+
     <script>
             SERVER_URL = "http://b8dddd36.ngrok.io"
             $(() => {
@@ -40,8 +39,6 @@
                 const options = {
                     body: "We received a new consultation request. Head over to the consultation overview to view it."
                 }
-                new Noty({ type: 'info',
-    layout: 'topRight', text: "New Consultation Request" }).show()
                 const n = new Notification("New Consultation Request", options)
             }
         
@@ -76,6 +73,7 @@
         }
         
         function show(html) {
+            console.log("Showing content: ", html)
             $("#content").html(html)
         }
         
@@ -101,8 +99,6 @@
                 const options = {
                     body: "Failed to receive patient list!"
                 }
-                new Noty({ type: 'alert',
-    layout: 'topRight',text: "Error: Failed to download patient list" }).show()
                 const n = new Notification("Error: Failed to download patient list!", options)
                 
             })
