@@ -1,6 +1,7 @@
 from flask_ask import Ask, question, statement, session
 from aws import addConsultationRequest, addInformationRequest, findPatient, getPatientInfo, addDiagnosis, getDiagnosis, getImageLink, getImageList
 from state import setLastPatientId
+from datetime import datetime
 
 def fixDecimal(x):
     x["timestamp"] = int(x["timestamp"])
@@ -68,12 +69,24 @@ def init(flaskApp, sio):
         sio.emit("new_consultation_request", None, namespace="/doctor")
         return statement("I have created a consultation request. A doctor will contact you shortly.")
 
+    @ask.intent("ConsultationIntent")
+    def handleConsultationIntent():
+        return handleMessageIntent(" ")
+
     @ask.intent("ScheduleConsultationIntent")
     def handleCreateConsultationRequest(date):
         addConsultationRequest(getPatientIdFromUser(session.user.userId), "The patient has requested a consultation on " + str(date))
         # TODO: send notification to doctor
         sio.emit("new_consultation_request", None, namespace="/doctor")
         return statement("I have created a consultation request on " + str(date) + ". A doctor will contact you shortly.")
+
+    @ask.intent("ShowDiagnosisIntent")
+    def handleShowDiagnosisIntent():
+        patientId = getPatientIdFromUser(session.user.userId)
+        diagnosis = getDiagnosis(patientId)
+        diagnose = diagnosis[len(diagnosis) - 1]
+        return statement("The latest diagnosis from your doctor was created on " + datetime.utcfromtimestamp(diagnose["timestamp"]).strftime('%Y-%m-%d %H:%M:%S') + ". The doctor said: " + str(diagnose["diagnosis"]))
+
 
     @ask.intent("RequestPictureIntent")
     def handleRequestInformationIntent():
@@ -106,4 +119,5 @@ def init(flaskApp, sio):
 
     @ask.intent("SendImageIntent")
     def handleSendImageIntent():
-        return statement("The images were sent successfully!")
+        sio.emit("take_picture", None, namespace="/patient")
+        return statement("Please take a picture of your face!")
