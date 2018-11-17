@@ -13,7 +13,8 @@ diagnosisTable = dynamodb.Table("Diagnosis")
 
 def findPatient(givenName, fullName):
     patients = getPatientList()
-    potentialPatients = list(filter(lambda x: x["givenName"] == givenName and x["familyName"] == fullName))
+    potentialPatients = list(filter(lambda x: x["givenName"].lower() == givenName and x["familyName"].lower() == fullName, patients))
+
     if len(potentialPatients) == 0:
         return None
     else:
