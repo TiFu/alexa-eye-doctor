@@ -1,10 +1,10 @@
 from flask import Blueprint, request
-from aws import getPatientInfo, getImageList, getImageLink, getConsultationRequests, getDiagnosis, findPatient, uploadImage
+from aws import getPatientList ,getPatientInfo, getImageList, getImageLink, getConsultationRequests, getDiagnosis, findPatient, uploadImage
 import json
 from state import lastPatientId
 from face_processor import FaceProcessor
 import os
-
+from alexa import getPatientData
 faceProcessor = FaceProcessor()
 
 IMAGE_PATH = "images/"
@@ -13,6 +13,12 @@ webapp_endpoints = Blueprint('webapp', __name__)
 @webapp_endpoints.route("/webapp", methods=["GET"])
 def testWebapp():
     return "Hello webapp"
+
+@webapp_endpoints.route("/patients", methods=["GET"])
+def getPatients():
+    patientList = getPatientList()
+    print(patientList)
+    return json.dumps(list(map(lambda x: getPatientData(x["patientId"]), patientList)))
 
 @webapp_endpoints.route("/info", methods=["GET"])
 def getInfoPatient():
