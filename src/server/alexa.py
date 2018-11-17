@@ -87,6 +87,15 @@ def init(flaskApp, sio):
         diagnose = diagnosis[len(diagnosis) - 1]
         return statement("The latest diagnosis from your doctor was created on " + datetime.utcfromtimestamp(diagnose["timestamp"]).strftime('%Y-%m-%d %H:%M:%S') + ". The doctor said: " + str(diagnose["diagnosis"]))
 
+    @ask.intent("ShowConsultationListIntent")
+    def handleShowConsultationListIntent():
+        sio.emit("show_consultation_list", namespace="/doctor")
+        return statement("Okay. I am opening the consultation list")
+
+    @ask.intent("ShowPatientListIntent")
+    def handleShowPatientListIntent():
+        sio.emit("show_patient_list", namepsace="/doctor")
+        return statement("Okay. I am opening the patient list")
 
     @ask.intent("RequestPictureIntent")
     def handleRequestInformationIntent():
