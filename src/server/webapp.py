@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from aws import getPatientInfo, getImageList, getImageLink, getConsultationRequests, getDiagnosis, findPatient, uploadImage
+from aws import getPatientList ,getPatientInfo, getImageList, getImageLink, getConsultationRequests, getDiagnosis, findPatient, uploadImage
 import json
 from state import lastPatientId
 from face_processor import FaceProcessor
@@ -13,6 +13,10 @@ webapp_endpoints = Blueprint('webapp', __name__)
 @webapp_endpoints.route("/webapp", methods=["GET"])
 def testWebapp():
     return "Hello webapp"
+
+@webapp_endpoints.route("/patients", methods=["GET"])
+def getPatients():
+    return json.dumps(getPatientList())
 
 @webapp_endpoints.route("/info", methods=["GET"])
 def getInfoPatient():

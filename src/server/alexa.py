@@ -13,11 +13,11 @@ def getPatientData(patientId):
         diagnosis = getDiagnosis(patientId)
         outputData = {
                 "id": patientInfo["patientId"],
-                "familyName": patientInfo["familyName"],
-                "givenName": patientInfo["givenName"],
                 "images": list(map(lambda x: getImageLink(x["s3Key"], x["s3Bucket"]), images)),
                 "diagnosis": list(map(fixDecimal, diagnosis))
         }
+        for key, val in patientInfo.items():
+            outputData[key] = val
         return outputData
 
 def init(flaskApp, sio):
