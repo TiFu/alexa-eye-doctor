@@ -1,4 +1,4 @@
-SERVER_URL = "https://15530701.ngrok.io"
+SERVER_URL = "https://aced6a24.ngrok.io/"
 
 function newConsultationRequestHandler() {
     console.log("received new consultation request handler")
