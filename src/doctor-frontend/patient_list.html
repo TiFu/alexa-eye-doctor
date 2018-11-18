@@ -69,6 +69,7 @@
                         .replace(/{birthdate}/g, entry["birthdate"])
                         .replace(/{location}/g, entry["location"].replace("\n", "<br />"))
                         .replace(/{image}/g, image)
+                        .replace(/{patientId}/g, entry["patientId"])
         }
         
         function showPatientList() {
@@ -114,7 +115,7 @@
                     </div><!-- .entry-content -->
     
                     <div class="entry-footer">
-                        <a href="#">Get medical records</a>
+                        <a href="patient_details.html?patientId={patientId}">Get medical records</a>
                     </div><!-- .entry-footer -->
                 </div><!-- .event-content-wrap -->
             </div><!-- .event-wrap -->
