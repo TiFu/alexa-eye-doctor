@@ -37,6 +37,8 @@ def getInfoName(patientName):
 
 @webapp_endpoints.route("/info/<patientId>", methods=["GET"])
 def getInfo(patientId):
+    if patientId == None:
+        return json.dumps({})
     patientInfo = getPatientInfo(patientId)
     images = getImageList(patientId)
     diagnosis = getDiagnosis(patientId)
