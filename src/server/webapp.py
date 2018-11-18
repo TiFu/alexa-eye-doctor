@@ -9,6 +9,7 @@ faceProcessor = FaceProcessor()
 
 IMAGE_PATH = "images/"
 
+
 webapp_endpoints = Blueprint('webapp', __name__)
 @webapp_endpoints.route("/webapp", methods=["GET"])
 def testWebapp():
