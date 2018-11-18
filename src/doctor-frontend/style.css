@@ -2145,3 +2145,7 @@ ul.tabs-nav .tab-nav.active {
     background: #131212;
     text-align: center;
 }
+
+#eye_img {
+    width: 50px;
+}
