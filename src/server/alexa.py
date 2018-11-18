@@ -45,7 +45,7 @@ def init(flaskApp, sio):
 
     @ask.intent("AMAZON.FallbackIntent")
     def handleFallbackIntent():
-        return statement("Amazon sucks!")
+        return statement("Fallback Intent!")
 
     @ask.intent("TestIntent")
     def handleTestIntent():
