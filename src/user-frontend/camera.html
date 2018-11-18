@@ -114,9 +114,8 @@
     <script type='text/javascript' src='js/jquery.countTo.min.js'></script>
     <script type='text/javascript' src='js/jquery.barfiller.js'></script>
     <script type='text/javascript' src='js/custom.js'></script>
+    <script src="./server.js"></script>
     <script>
-          SERVER_URL = "http://b8dddd36.ngrok.io"
-
           function resize_canvas(element) {
             var w = element.offsetWidth;
             var h = element.offsetHeight;
@@ -148,10 +147,13 @@
 
           $("#send").click(() => {
                 var img = canvas.toDataURL();
+                console.log("Sending request to server")
                 $.ajax({
                   type: "POST",
-                  url: SERVER_URL + "/uploadImage",
-                  data: img,
+                  url: SERVER_URL + "/api/uploadImage",
+                  data: {
+                      "image": img
+                  },
                   success: function(response) {
                     console.log(response);
                     if (response == "0") {
@@ -164,6 +166,8 @@
                         console.log("Bad face");
                     }
                   }
+                }).error((xhr, text, errorThrown) => {
+                    console.log("error", text, errorThrown)
                 });
           });
 

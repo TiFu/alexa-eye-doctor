@@ -58,12 +58,23 @@ def fetchConsultations():
 
 
 import uuid
+import base64
 
 @webapp_endpoints.route("/uploadImage", methods=["POST"])
 def uploadImageRequest():
-    file = request.files["image"]
+    print("Requested upload image")
+    print(request.form["image"])
+    file = request.form["image"]
+    print(file)
     f = os.path.join(IMAGE_PATH, lastPatientId + ".jpg")
-    file.save(f)
+    with open(f, "wb") as outputFile:
+        missing_padding = len(file) % 4
+        if missing_padding != 0:
+            file += '='*(4 - missing_padding)
+        file = base64.b64decode(file)
+        outputFile.write(file)
+        outputFile.flush()
+
     print("Saving image file")
     try:
         eyeData = faceProcessor.get_eye_data(f)
