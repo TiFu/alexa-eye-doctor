@@ -22,11 +22,16 @@
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="css/swiper.min.css">
 
+    <!-- Loader CSS -->
+    <link rel="stylesheet" href="css/loader.css">
+
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
 
     <!-- Icon -->
     <link rel="shortcut icon" href="img/Logo.ico">
+
+    <!-- JS -->
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
@@ -37,7 +42,7 @@
                 registerDoctor()
                 fetchPatientData()
             })
-                
+
             function fetchPatientData() {
                 const patientId = getPatientId()
                 $.get(SERVER_URL + "/api/info/" + patientId).done((data, status, jqHxr) => {
@@ -52,14 +57,14 @@
                                 text: "Error: Failed to download patient data"
                         }).show()
                     const n = new Notification("Error: Failed to download patient data!", options)
-                    
+
                 })
             }
 
             function updatePatientData(patient) {
                 patient = JSON.parse(patient)
                 console.log(patient)
-                updateDiagnosisData(patient["diagnosis"])   
+                updateDiagnosisData(patient["diagnosis"])
                 updateImages(patient["images"])
                 updatePersonalData(patient)
             }
@@ -96,16 +101,16 @@
 
             function updateDiagnosisData(data) {
                 console.log(data)
-                let patientList = ""; 
+                let patientList = "";
                 if (data.length > 0) {
                     patientList = data.reverse().map((x) => getDiagnosisEntry(x)).reduce((prev, next) => prev + next)
                 }
                 header = "<div class=\"section-heading\">" +
-                            "<h2 class=\"entry-title\">Diagnosis History</h2>" + 
+                            "<h2 class=\"entry-title\">Diagnosis History</h2>" +
                         "</div><!-- .section-heading -->"
                 $("#diagnosisEntries").html(header + patientList)
             }
-        
+
             function getDiagnosisEntry(entry) {
                 const date = new Date(entry["timestamp"] * 1000)
                 return $("#diagnosisEntry")
@@ -126,53 +131,55 @@
                 new Noty({ type: 'info',
     layout: 'topRight', text: "New Consultation Request" }).show()
                 const n = new Notification("New Consultation Request", options)
-            } 
-        </script>
+            }
+    </script>
 </head>
 <body>
     <div id="patientEntry" style="display: none">
-            <div class="event-wrap d-flex flex-wrap justify-content-between">
-                <figure class="m-0">
-                    <img src="{image}" alt="">
-                </figure>
+        <div class="event-wrap d-flex flex-wrap justify-content-between">
+            <figure class="m-0">
+                <img src="{image}" alt="">
+            </figure>
     
-                <div class="event-content-wrap">
-                    <header class="entry-header d-flex flex-wrap align-items-center">
-                        <h3 class="entry-title w-100 m-0"><a href="#">{name}</a></h3>
+            <div class="event-content-wrap">
+                <header class="entry-header d-flex flex-wrap align-items-center">
+                    <h3 class="entry-title w-100 m-0"><a href="#">{name}</a></h3>
     
-                        <div class="posted-date">
-                            <a href="#">{birthdate}</a>
-                        </div><!-- .posted-date -->
-    
-                    </header><!-- .entry-header -->
-    
-                    <div class="entry-content">
-                        {location}    
-                    </div><!-- .entry-content -->
-    
-                </div><!-- .event-content-wrap -->
-            </div><!-- .event-wrap -->
-        </div>
-    <div id="diagnosisEntry" style="display: none">
-            <div class="event-wrap d-flex flex-wrap justify-content-between">
                     <div class="posted-date">
-                        <a href="#">{date}</a>
+                        <a href="#">{birthdate}</a>
                     </div><!-- .posted-date -->
-
-                    <div class="event-content-wrap">
-                        <div class="entry-content">
-                            <p class="m-0">{message}</p>
-                        </div><!-- .entry-content -->
-                    </div><!-- .upcoming-events -->
-                </div><!-- .col -->
+    
+                </header><!-- .entry-header -->
+    
+                <div class="entry-content">
+                    {location}    
+                </div><!-- .entry-content -->
+    
+            </div><!-- .event-content-wrap -->
+        </div><!-- .event-wrap -->
     </div>
+
+    <div id="diagnosisEntry" style="display: none">
+        <div class="event-wrap d-flex flex-wrap justify-content-between">
+            <div class="posted-date">
+                <a href="#">{date}</a>
+            </div><!-- .posted-date -->
+
+            <div class="event-content-wrap">
+                <div class="entry-content">
+                    <p class="m-0">{message}</p>
+                </div><!-- .entry-content -->
+            </div><!-- .upcoming-events -->
+        </div><!-- .col -->
+    </div>
+
     <header class="site-header">
         <div class="nav-bar">
             <div class="container">
                 <div class="row">
                     <div class="col-12 d-flex flex-wrap justify-content-between align-items-center">
                         <div class="site-branding d-flex align-items-center">
-                            <a class="d-block" href="patient_list.html" rel="home"><img class="d-block" src="img/Logo.ico" alt="logo"></a>
+                            <a class="d-block" href="index.html" rel="home"><img class="d-block" src="img/Logo.ico" alt="logo"></a>
                         </div><!-- .site-branding -->
 
                         <nav class="site-navigation d-flex justify-content-end align-items-center">

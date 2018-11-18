@@ -25,6 +25,11 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- Loader CSS -->
+    <link rel="stylesheet" href="css/loader.css">
+
+    <!-- JS -->
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
@@ -34,7 +39,7 @@
                 registerDoctor()
                 showPatientList()
             })
-        
+
             function newConsultationRequestHandler() {
                 console.log("received new consultation request handler")
                 const options = {
@@ -44,7 +49,7 @@
     layout: 'topRight', text: "New Consultation Request" }).show()
                 const n = new Notification("New Consultation Request", options)
             }
-        
+
         function updatePatientList(data) {
             data = JSON.parse(data)
             patientList = data["consultations"].map((x) => getPatientListEntry(x, data["patients"][x["patientId"]])).reduce((prev, next) => prev + next)
@@ -53,11 +58,11 @@
                         + "</div><!-- .section-heading -->"
             show(header + patientList)
         }
-        
+
         function show(html) {
             $("#content").html(html)
         }
-        
+
         function getPatientListEntry(entry, person) {
             let image = person["image"]
             return $("#patientEntry")
@@ -66,7 +71,7 @@
                         .replace(/{location}/g, (entry["message"] || " ").replace("\n", "<br />"))
                         .replace(/{image}/g, image)
         }
-        
+
         function showPatientList() {
             console.log("Sending request!", SERVER_URL + "/api/consultations")
             $.get(SERVER_URL + "/api/consultations").done((data, status, jqHxr) => {
@@ -80,7 +85,7 @@
                 new Noty({ type: 'alert',
     layout: 'topRight',text: "Error: Failed to download consultation list" }).show()
                 const n = new Notification("Error: Failed to download consultation list!", options)
-                
+
             })
         }
     </script>
@@ -160,8 +165,39 @@
                         <div class="section-heading">
                             <h2 class="entry-title">Registered Consultations</h2>
 
-                            <div style="padding-top:50px">
-                                <div class="loader" style="margin:auto;"></div>
+                            <div class="dank-ass-loader" style="padding: 96px;">
+                                <div class="row">
+                                    <div class="arrow up outer outer-18"></div>
+                                    <div class="arrow down outer outer-17"></div>
+                                    <div class="arrow up outer outer-16"></div>
+                                    <div class="arrow down outer outer-15"></div>
+                                    <div class="arrow up outer outer-14"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="arrow up outer outer-1"></div>
+                                    <div class="arrow down outer outer-2"></div>
+                                    <div class="arrow up inner inner-6"></div>
+                                    <div class="arrow down inner inner-5"></div>
+                                    <div class="arrow up inner inner-4"></div>
+                                    <div class="arrow down outer outer-13"></div>
+                                    <div class="arrow up outer outer-12"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="arrow down outer outer-3"></div>
+                                    <div class="arrow up outer outer-4"></div>
+                                    <div class="arrow down inner inner-1"></div>
+                                    <div class="arrow up inner inner-2"></div>
+                                    <div class="arrow down inner inner-3"></div>
+                                    <div class="arrow up outer outer-11"></div>
+                                    <div class="arrow down outer outer-10"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="arrow down outer outer-5"></div>
+                                    <div class="arrow up outer outer-6"></div>
+                                    <div class="arrow down outer outer-7"></div>
+                                    <div class="arrow up outer outer-8"></div>
+                                    <div class="arrow down outer outer-9"></div>
+                                </div>
                             </div>
                         </div><!-- .section-heading -->
                     </div><!-- .upcoming-events -->
