@@ -152,8 +152,17 @@
                   type: "POST",
                   url: SERVER_URL + "/uploadImage",
                   data: img,
-                  success: function() {
-                    console.log("Success");
+                  success: function(response) {
+                    console.log(response);
+                    if (response == "0") {
+                        console.log("Success");
+                    }
+                    else if (response == "1") {
+                        console.log("Bad eye");
+                    }
+                    else if (response == "2") {
+                        console.log("Bad face");
+                    }
                   }
                 });
           });
