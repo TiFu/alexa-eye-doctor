@@ -64,10 +64,7 @@ from urllib.parse import urlparse
 
 @webapp_endpoints.route("/uploadImage", methods=["POST"])
 def uploadImageRequest():
-    print("Requested upload image")
-    print(request.form["image"])
     file = request.form["image"]
-    print(file)
     f = os.path.join(IMAGE_PATH, lastPatientId + ".jpg")
 
     up = urlparse(file)
