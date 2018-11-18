@@ -56,7 +56,6 @@ def init(flaskApp, sio):
         patientId = getPatientIdFromUser(session.user.userId)
         setLastPatientId(patientId)
         updatePatientData(patientId, "/patient")
-        sio.emit("show_patient_overview", patientId, namespace="/doctor")
         return statement("Okay, I'm opening your patient data.")
 
     @ask.intent("VideoCallIntent")
@@ -95,7 +94,8 @@ def init(flaskApp, sio):
 
     @ask.intent("ShowPatientListIntent")
     def handleShowPatientListIntent():
-        sio.emit("show_patient_list", namepsace="/doctor")
+        print("Emitting show_patient_list event")
+        sio.emit("show_patient_list", namespace="/doctor")
         return statement("Okay. I am opening the patient list")
 
     @ask.intent("RequestPictureIntent")
@@ -114,6 +114,7 @@ def init(flaskApp, sio):
         if patient is None:
                 return statement("Sorry, I couldn't find " + str(name) + " in our database.")
         else:
+                sio.emit("show_patient_overview", patient["patientId"], namespace="/doctor")
                 doctorState[session.user.userId] = patient["patientId"]
                 updatePatientData(patient["patientId"], "/doctor")
                 return statement("Opening " + str(name) + "'s file.")

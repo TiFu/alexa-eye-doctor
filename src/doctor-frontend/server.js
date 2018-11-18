@@ -1,4 +1,4 @@
-SERVER_URL = "https://77e9b309.ngrok.io"
+SERVER_URL = "https://15530701.ngrok.io"
 
 function newConsultationRequestHandler() {
     console.log("received new consultation request handler")
@@ -14,9 +14,10 @@ layout: 'topRight', text: "New Consultation Request" }).show()
 function registerDoctor() {
     var doctor_socket = io.connect(SERVER_URL + "/doctor")
 
-    doctor_socket.on("connect", () => {
+    doctor_socket.on("connect", (socket) => {
         console.log("[DOCTOR] Connected!")
     })
+
     doctor_socket.on("new_consultation_request", newConsultationRequestHandler)
     
     doctor_socket.on("show_patient_overview", (patient_id) => {
@@ -24,10 +25,12 @@ function registerDoctor() {
     })
 
     doctor_socket.on("show_consultation_list", () => {
+        console.log("show consultation list")
         window.location.href="./consultation_list.html"
     })
 
     doctor_socket.on("show_patient_list", () => {
+        console.log("received show patient list request")
         window.location.href="./patient_list.html"
     })
 
