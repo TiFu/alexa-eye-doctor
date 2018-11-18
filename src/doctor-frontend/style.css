@@ -843,17 +843,17 @@ ul.tabs-nav .tab-nav.active {
 }
 
 .event-wrap figure {
-    width: 144px;
+    width: 200px;
     height: auto;
 }
 
 .event-wrap figure img {
     display: block;
-    width: 100%;
+    width: 100%;        
 }
 
 .event-content-wrap {
-    width: calc(100% - 180px);
+    width: calc(100% - 220px);
     margin-top: -10px;
 }
 
@@ -2147,5 +2147,13 @@ ul.tabs-nav .tab-nav.active {
 }
 
 #eye_img {
-    width: 50px;
+    width: 100px !important;
+}
+
+#face_img {
+    width: 200px !important;
+}
+
+.eye_p {
+    padding-left: 15px;
 }
