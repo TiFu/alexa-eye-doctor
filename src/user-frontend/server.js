@@ -1,4 +1,4 @@
-SERVER_URL = "https://ec2-18-203-236-54.eu-west-1.compute.amazonaws.com/"
+SERVER_URL = "https://ec2-18-203-236-54.eu-west-1.compute.amazonaws.com"
 
 function newConsultationRequestHandler() {
     console.log("received new consultation request handler")
