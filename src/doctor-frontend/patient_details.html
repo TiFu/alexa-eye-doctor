@@ -79,7 +79,7 @@
                 }
                 console.log(entry)
                 let eyeColor = "" 
-                if (entry["EyeColorBrown"] && entry["EyeColorBlue"] && entry["EyeColorGreen"]) {
+                if (entry["EyeColorBrown"] != null && entry["EyeColorBlue"] != null && entry["EyeColorGreen"] != null) {
                     if (entry["EyeColorBrown"] > entry["EyeColorBlue"] && entry["EyeColorBrown"] > entry["EyeColorGreen"]) {
                         eyeColor = "Eye Color: Brown"
                     }
