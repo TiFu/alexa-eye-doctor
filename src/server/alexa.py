@@ -56,6 +56,7 @@ def init(flaskApp, sio):
         patientId = getPatientIdFromUser(session.user.userId)
         setLastPatientId(patientId)
         updatePatientData(patientId, "/patient")
+        sio.emit("show_patient_overview", patientId, namespace="/doctor")
         return statement("Okay, I'm opening your patient data.")
 
     @ask.intent("VideoCallIntent")
