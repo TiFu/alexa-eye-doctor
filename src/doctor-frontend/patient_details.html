@@ -79,8 +79,12 @@
             }
 
             function updateImages(images) {
-                entries = images.filter((x) => !x.endsWith("face.jpg")).map((x, idx) => getImageEntry(x, idx==0));
-                $("#imageContainer").html(entries.reduce((prev, next) => prev + next))
+                let entries = ""
+                if (images.length > 0) {
+                    entries = images.filter((x) => !x.endsWith("face.jpg")).map((x, idx) => getImageEntry(x, idx==0));
+                    entries = entries.reduce((prev, next) => prev + next)
+                }
+                $("#imageContainer").html(entries)
             }
 
             function getImageEntry(image, active = false) {
