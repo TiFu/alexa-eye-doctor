@@ -78,14 +78,14 @@ def uploadImageRequest():
         elif bit == 'base64':
             b64 = True
     plaindata = base64.b64decode(data)
+
     with open(f, "wb") as outputFile:
         outputFile.write(plaindata)
 
 
-    print("Saving image file")
     try:
         eyeData = faceProcessor.get_eye_data(f)
-        print("got eye data: " + str(eyeData))
+        print("Got eye data: " + str(eyeData))
     except Exception as e:
         return str(2)
     if eyeData == faceProcessor.ERROR_BAD_EYE:

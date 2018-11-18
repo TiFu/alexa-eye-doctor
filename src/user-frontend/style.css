@@ -2159,6 +2159,34 @@ video {
     z-index: 10;
 }
 
+#popup_ {
+    display: none;
+    position: absolute;
+    top: 25px;
+    left: 100px;
+    z-index: 10;
+    width: 325px;
+    height: 450px;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+#popup_t {
+    position: absolute;
+    top: 170px;
+    left: 25px;
+    width: 275px;
+    text-align: center;
+    color: white;
+}
+
+#popup_b {
+    position: absolute;
+    width: 150px;
+    bottom: 30px;
+    left: 87px;
+}
+
+
 .title_ {
     padding-top: 20px !important;
     padding-bottom: 0 !important;
