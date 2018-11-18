@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Diagnose - patient list</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- FontAwesome CSS -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+
+    <!-- ElegantFonts CSS -->
+    <link rel="stylesheet" href="css/elegant-fonts.css">
+
+    <!-- themify-icons CSS -->
+    <link rel="stylesheet" href="css/themify-icons.css">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="css/swiper.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+    
+    <!-- Icon -->
+    <link rel="shortcut icon" href="img/Logo.ico">
+
+</head>
+<body>
+    
+    <header class="site-header">
+        <div class="nav-bar">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 d-flex flex-wrap justify-content-between align-items-center">
+                        <div class="site-branding d-flex align-items-center">
+                            <a class="d-block" href="patient_list.html" rel="home"><img class="d-block" src="img/Logo.ico" alt="logo"></a>
+                        </div><!-- .site-branding -->
+
+                        <nav class="site-navigation d-flex justify-content-end align-items-center">
+                            <ul class="d-flex flex-column flex-lg-row justify-content-lg-end align-content-center">
+                                <li class="current-menu-item"><a href="patient_list.html">Patient list</a></li>
+                                <li><a href=#>Consultation list</a></li>
+                            </ul>
+                        </nav><!-- .site-navigation -->
+
+                        <div class="hamburger-menu d-lg-none">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div><!-- .hamburger-menu -->
+                    </div><!-- .col -->
+                </div><!-- .row -->
+            </div><!-- .container -->
+        </div><!-- .nav-bar -->
+    </header><!-- .site-header -->
+
+    <div class="home-page-events title_">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <div class="upcoming-events" id="content">
+                        <div class="section-heading">
+                            <h2 class="entry-title">Take photo for the doctor</h2>
+                        </div><!-- .section-heading -->
+                    </div><!-- .upcoming-events -->
+                </div><!-- .col -->
+            </div><!-- .row -->
+        </div><!-- .container -->
+    </div><!-- .home-page-events -->
+
+    <div class="home-page-events home_">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <div class="upcoming-events" id="content">
+                        <div class="section-heading">
+                            <video id="player" controls autoplay onplay="resize_canvas(this)"></video>
+                            <canvas id="canvas"></canvas>
+                            <button class="btn btn1" id="capture">Capture</button>
+                            <button class="btn" id="send" disabled="true">Send</button>
+                        </div><!-- .section-heading -->
+                    </div><!-- .upcoming-events -->
+                </div><!-- .col -->
+            </div><!-- .row -->
+        </div><!-- .container -->
+    </div><!-- .home-page-events -->
+
+    <footer class="site-footer">
+        <div class="footer-bar footer_">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <p class="m-0">Alexa Eye Doctor</p>
+                    </div><!-- .col-12 -->
+                </div><!-- .row -->
+            </div><!-- .container -->
+        </div><!-- .footer-bar -->
+    </footer><!-- .site-footer -->
+
+    <script type='text/javascript' src='js/jquery.js'></script>
+    <script type='text/javascript' src='js/jquery.collapsible.min.js'></script>
+    <script type='text/javascript' src='js/swiper.min.js'></script>
+    <script type='text/javascript' src='js/jquery.countdown.min.js'></script>
+    <script type='text/javascript' src='js/circle-progress.min.js'></script>
+    <script type='text/javascript' src='js/jquery.countTo.min.js'></script>
+    <script type='text/javascript' src='js/jquery.barfiller.js'></script>
+    <script type='text/javascript' src='js/custom.js'></script>
+    <script>
+          SERVER_URL = "http://b8dddd36.ngrok.io"
+
+          function resize_canvas(element) {
+            var w = element.offsetWidth;
+            var h = element.offsetHeight;
+            var cv = document.getElementById("canvas");
+            cv.width = w;
+            cv.height = h;
+          }
+
+          const canvas = document.getElementById('canvas');
+          const context = canvas.getContext('2d');
+          const captureButton = document.getElementById('capture');
+
+          const constraints = {
+            video: true,
+          };
+
+          captureButton.addEventListener('click', () => {
+            if ($("#capture").text() == "Capture") {
+                context.drawImage(player, 0, 0, canvas.width, canvas.height);
+                $("#capture").text('Re-capture');
+                $("#send").prop('disabled', false);
+            }
+            else {
+                context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+                $("#capture").text('Capture');
+                $("#send").prop('disabled', true);
+            }
+          });
+
+          $("#send").click(() => {
+                var img = canvas.toDataURL();
+                $.ajax({
+                  type: "POST",
+                  url: SERVER_URL + "/uploadImage",
+                  data: img,
+                  success: function() {
+                    console.log("Success");
+                  }
+                });
+          });
+
+          // Attach the video stream to the video element and autoplay.
+          navigator.mediaDevices.getUserMedia(constraints)
+            .then((stream) => {
+              player.srcObject = stream;
+            });
+    </script>
+
+
+</body>
+</html>
