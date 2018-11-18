@@ -111,6 +111,7 @@ def init(flaskApp, sio):
     @ask.intent("RequestPictureIntent")
     def handleRequestInformationIntent():
         patientId = doctorState[session.user.userId]
+        patient = getPatientInfo(patientId)
         addInformationRequest(patientId)
         # todo send notification to patient
         updatePatientData(patientId, "/patient")
