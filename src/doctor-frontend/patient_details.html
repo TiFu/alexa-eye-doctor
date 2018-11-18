@@ -80,7 +80,7 @@
 
             function updateImages(images) {
                 entries = images.filter((x) => !x.endsWith("face.jpg")).map((x, idx) => getImageEntry(x, idx==0));
-                $("#imageContainer").html(header + entries.reduce((prev, next) => prev + next))
+                $("#imageContainer").html(entries.reduce((prev, next) => prev + next))
             }
 
             function getImageEntry(image, active = false) {
