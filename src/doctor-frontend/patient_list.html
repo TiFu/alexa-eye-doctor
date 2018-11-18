@@ -23,29 +23,75 @@
     <link rel="stylesheet" href="css/swiper.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.css">
 
-    <!-- Loader CSS -->
-    <link rel="stylesheet" href="css/loader.css">
-
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
-
-    <!-- JS -->
-    <script type='text/javascript' src='js/jquery.js'></script>
-    <script type='text/javascript' src='js/jquery.collapsible.min.js'></script>
-    <script type='text/javascript' src='js/swiper.min.js'></script>
-    <script type='text/javascript' src='js/jquery.countdown.min.js'></script>
-    <script type='text/javascript' src='js/circle-progress.min.js'></script>
-    <script type='text/javascript' src='js/jquery.countTo.min.js'></script>
-    <script type='text/javascript' src='js/jquery.barfiller.js'></script>
-    <script type='text/javascript' src='js/custom.js'></script>
-    <script type='text/javascript' src="http://code.jquery.com/jquery-latest.min.js"></script>
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
-    <script type='text/javascript' src="./server.js"></script>
-    <script type='text/javascript' src="js/script2.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+    <script src="./server.js"></script>
+    <script>
+            $(() => {
+                registerDoctor()
+                showPatientList()
+            })
+        
+            function newConsultationRequestHandler() {
+                console.log("received new consultation request handler")
+                const options = {
+                    body: "We received a new consultation request. Head over to the consultation overview to view it."
+                }
+                new Noty({ type: 'info',
+    layout: 'topRight', text: "New Consultation Request" }).show()
+                const n = new Notification("New Consultation Request", options)
+            }
+        
+        function updatePatientList(data) {
+            data = JSON.parse(data)
+            patientList = data.map((x) => getPatientListEntry(x)).reduce((prev, next) => prev + next)
+            header = "<div class=\"section-heading\">"
+                        + "<h2 class=\"entry-title\">Registered patients</h2>"
+                        + "</div><!-- .section-heading -->"
+            show(header + patientList)
+        }
+        
+        function show(html) {
+            $("#content").html(html)
+        }
+        
+        function getPatientListEntry(entry) {
+            let images = entry["images"].filter((x) => x.endsWith("face.jpg"));
+            let image = "";
+            if (images.length >= 1) {
+                image = images[0]
+            }
+            return $("#patientEntry")
+                        .html().replace(/{name}/g, entry["givenName"] + " " + entry["familyName"])
+                        .replace(/{birthdate}/g, entry["birthdate"])
+                        .replace(/{location}/g, entry["location"].replace("\n", "<br />"))
+                        .replace(/{image}/g, image)
+                        .replace(/{patientId}/g, entry["patientId"])
+        }
+        
+        function showPatientList() {
+            console.log("Sending request!", SERVER_URL + "/api/patients")
+            $.get(SERVER_URL + "/api/patients").done((data, status, jqHxr) => {
+                updatePatientList(data)
+            })
+            .fail((xhr, textStatus, errorThrown) => {
+                const options = {
+                    body: "Failed to receive patient list!"
+                }
+                new Noty({ type: 'alert',
+    layout: 'topRight',text: "Error: Failed to download patient list" }).show()
+                const n = new Notification("Error: Failed to download patient list!", options)
+                
+            })
+        }
+    </script>
 
     <!-- Icon -->
     <link rel="shortcut icon" href="img/Logo.ico">
+
 </head>
 <body>
     <div id="patientEntry" style="display: none">
@@ -80,7 +126,7 @@
                 <div class="row">
                     <div class="col-12 d-flex flex-wrap justify-content-between align-items-center">
                         <div class="site-branding d-flex align-items-center">
-                            <a class="d-block" href="index.html" rel="home"><img class="d-block" src="img/Logo.ico" alt="logo"></a>
+                            <a class="d-block" href="patient_list.html" rel="home"><img class="d-block" src="img/Logo.ico" alt="logo"></a>
                         </div><!-- .site-branding -->
 
                         <nav class="site-navigation d-flex justify-content-end align-items-center">
@@ -109,41 +155,10 @@
                 <div class="col-12 col-lg-6">
                     <div class="upcoming-events" id="content">
                         <div class="section-heading">
-                            <h2 class="entry-title">Registered Patients</h2>
+                            <h2 class="entry-title">Registered patients</h2>
 
-                            <div class="dank-ass-loader" style="padding: 96px;">
-                                <div class="row">
-                                    <div class="arrow up outer outer-18"></div>
-                                    <div class="arrow down outer outer-17"></div>
-                                    <div class="arrow up outer outer-16"></div>
-                                    <div class="arrow down outer outer-15"></div>
-                                    <div class="arrow up outer outer-14"></div>
-                                </div>
-                                <div class="row">
-                                    <div class="arrow up outer outer-1"></div>
-                                    <div class="arrow down outer outer-2"></div>
-                                    <div class="arrow up inner inner-6"></div>
-                                    <div class="arrow down inner inner-5"></div>
-                                    <div class="arrow up inner inner-4"></div>
-                                    <div class="arrow down outer outer-13"></div>
-                                    <div class="arrow up outer outer-12"></div>
-                                </div>
-                                <div class="row">
-                                    <div class="arrow down outer outer-3"></div>
-                                    <div class="arrow up outer outer-4"></div>
-                                    <div class="arrow down inner inner-1"></div>
-                                    <div class="arrow up inner inner-2"></div>
-                                    <div class="arrow down inner inner-3"></div>
-                                    <div class="arrow up outer outer-11"></div>
-                                    <div class="arrow down outer outer-10"></div>
-                                </div>
-                                <div class="row">
-                                    <div class="arrow down outer outer-5"></div>
-                                    <div class="arrow up outer outer-6"></div>
-                                    <div class="arrow down outer outer-7"></div>
-                                    <div class="arrow up outer outer-8"></div>
-                                    <div class="arrow down outer outer-9"></div>
-                                </div>
+                            <div style="padding-top:50px">
+                                <div class="loader" style="margin:auto;"></div> 
                             </div>
                         </div><!-- .section-heading -->
                     </div><!-- .upcoming-events -->
@@ -163,5 +178,15 @@
             </div><!-- .container -->
         </div><!-- .footer-bar -->
     </footer><!-- .site-footer -->
+
+    <script type='text/javascript' src='js/jquery.js'></script>
+    <script type='text/javascript' src='js/jquery.collapsible.min.js'></script>
+    <script type='text/javascript' src='js/swiper.min.js'></script>
+    <script type='text/javascript' src='js/jquery.countdown.min.js'></script>
+    <script type='text/javascript' src='js/circle-progress.min.js'></script>
+    <script type='text/javascript' src='js/jquery.countTo.min.js'></script>
+    <script type='text/javascript' src='js/jquery.barfiller.js'></script>
+    <script type='text/javascript' src='js/custom.js'></script>
+
 </body>
 </html>
