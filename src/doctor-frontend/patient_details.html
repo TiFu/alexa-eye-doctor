@@ -45,10 +45,12 @@
 
             function fetchPatientData() {
                 const patientId = getPatientId()
+                console.log("Calling: " + SERVER_URL + "/api/info/" + patientId)
                 $.get(SERVER_URL + "/api/info/" + patientId).done((data, status, jqHxr) => {
                     updatePatientData(data)
                 })
                 .fail((xhr, textStatus, errorThrown) => {
+                    console.log(textStatus, errorThrown)
                     const options = {
                         body: "Failed to receive patient data!"
                     }
