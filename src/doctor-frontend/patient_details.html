@@ -92,7 +92,10 @@
 
             function updateDiagnosisData(data) {
                 console.log(data)
-                patientList = data.reverse().map((x) => getDiagnosisEntry(x)).reduce((prev, next) => prev + next)
+                let patientList = ""; 
+                if (data.length > 0) {
+                    patientList = data.reverse().map((x) => getDiagnosisEntry(x)).reduce((prev, next) => prev + next)
+                }
                 header = "<div class=\"section-heading\">" +
                             "<h2 class=\"entry-title\">Diagnosis History</h2>" + 
                         "</div><!-- .section-heading -->"
