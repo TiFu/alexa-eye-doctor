@@ -59,6 +59,8 @@ def fetchConsultations():
 
 import uuid
 import base64
+from binascii import a2b_base64
+from urllib.parse import urlparse
 
 @webapp_endpoints.route("/uploadImage", methods=["POST"])
 def uploadImageRequest():
@@ -67,13 +69,21 @@ def uploadImageRequest():
     file = request.form["image"]
     print(file)
     f = os.path.join(IMAGE_PATH, lastPatientId + ".jpg")
+
+    up = urlparse(file)
+    head, data = up.path.split(',', 1)
+    bits = head.split(';')
+    mime_type = bits[0] if bits[0] else 'text/plain'
+    charset, b64 = 'ASCII', False
+    for bit in bits:
+        if bit.startswith('charset='):
+            charset = bit[8:]
+        elif bit == 'base64':
+            b64 = True
+    plaindata = base64.b64decode(data)
     with open(f, "wb") as outputFile:
-        missing_padding = len(file) % 4
-        if missing_padding != 0:
-            file += '='*(4 - missing_padding)
-        file = base64.b64decode(file)
-        outputFile.write(file)
-        outputFile.flush()
+        outputFile.write(plaindata)
+
 
     print("Saving image file")
     try:
