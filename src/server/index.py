@@ -12,6 +12,11 @@ sio = sio_impl.init(app)
 CORS(app)
 alexa.init(app, sio)
 
+@app.route('/public/<path:path>')
+def static_proxy(path):
+  # send_static_file will guess the correct MIME type
+  return app.send_static_file("./public/" + path)
+
 if __name__ == "__main__":
     if config["ssl"]:
         sio.run(app, ssl_context='adhoc', host=config["host"], port=config["port"]) 
