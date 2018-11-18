@@ -85,6 +85,10 @@
                         <div class="section-heading">
                             <video id="player" controls autoplay onplay="resize_canvas(this)"></video>
                             <canvas id="canvas"></canvas>
+                            <div id="popup_">
+                                <div id="popup_t">Stupid idiot, make a normal photo!</div>
+                                <button class="btn" id="popup_b">Dismiss</button>
+                            </div>
                             <button class="btn btn1" id="capture">Capture</button>
                             <button class="btn" id="send" disabled="true">Send</button>
                         </div><!-- .section-heading -->
@@ -145,6 +149,13 @@
             }
           });
 
+          $("#popup_b").click(() => {
+            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+            $("#popup_").css('display', 'none');  
+            $("#capture").text('Capture');
+            $("#send").prop('disabled', true);
+          });
+
           $("#send").click(() => {
                 var img = canvas.toDataURL();
                 console.log("Sending request to server")
@@ -155,16 +166,16 @@
                       "image": img
                   },
                   success: function(response) {
-                    console.log(response);
                     if (response == "0") {
-                        console.log("Success");
+                        $("#popup_t").text("Thank you, the image has been successfully uploaded. Have a nice day!");
                     }
                     else if (response == "1") {
-                        console.log("Bad eye");
+                        $("#popup_t").text("It seems like you closed your eyes. Please, take a photo with both eyes opened.");
                     }
                     else if (response == "2") {
-                        console.log("Bad face");
+                        $("#popup_t").text("Unfortunately, we were not able to identify your face on the photo. Please, try taking another one.");
                     }
+                    $("#popup_").css('display', 'block');  
                   }
                 }).error((xhr, text, errorThrown) => {
                     console.log("error", text, errorThrown)
