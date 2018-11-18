@@ -168,6 +168,7 @@
                   success: function(response) {
                     if (response == "0") {
                         $("#popup_t").text("Thank you, the image has been successfully uploaded. Have a nice day!");
+                        window.location.href="./patient_details.html" // Redirect
                     }
                     else if (response == "1") {
                         $("#popup_t").text("It seems like you closed your eyes. Please, take a photo with both eyes opened.");

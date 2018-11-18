@@ -51,11 +51,17 @@ def init(flaskApp, sio):
     def handleTestIntent():
         return statement("Test Intent successful!")
 
+    @ask.intent("TakePictureIntent")
+    def takePictureEvent():
+        sio.emit("take_picture_intent", namespace="/patient")
+        return statement("Okay, I am opening the camera app.")
+
     @ask.intent("ViewPatientDataIntent") # Alexa, show me my diagnosis
     def handleViewPatientIntent():
         patientId = getPatientIdFromUser(session.user.userId)
         setLastPatientId(patientId)
         updatePatientData(patientId, "/patient")
+        sio.emit("refresh_details", namespace="/patient")
         return statement("Okay, I'm opening your patient data.")
 
     @ask.intent("VideoCallIntent")

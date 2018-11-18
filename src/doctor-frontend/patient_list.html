@@ -28,25 +28,25 @@
     
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
-    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
     <script src="./server.js"></script>
     <script>
-            $(() => {
-                registerDoctor()
-                showPatientList()
-            })
+        $(() => {
+            registerDoctor()
+            showPatientList()
+        })
         
-            function newConsultationRequestHandler() {
-                console.log("received new consultation request handler")
-                const options = {
-                    body: "We received a new consultation request. Head over to the consultation overview to view it."
-                }
-                new Noty({ type: 'info',
-    layout: 'topRight', text: "New Consultation Request" }).show()
-                const n = new Notification("New Consultation Request", options)
+        function newConsultationRequestHandler() {
+            console.log("received new consultation request handler")
+            const options = {
+                body: "We received a new consultation request. Head over to the consultation overview to view it."
             }
+            new Noty({ type: 'info',
+layout: 'topRight', text: "New Consultation Request" }).show()
+            const n = new Notification("New Consultation Request", options)
+        }
         
         function updatePatientList(data) {
             data = JSON.parse(data)
