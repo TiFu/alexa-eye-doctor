@@ -40,13 +40,17 @@ def getInfo(patientId):
     patientInfo = getPatientInfo(patientId)
     images = getImageList(patientId)
     diagnosis = getDiagnosis(patientId)
-    return json.dumps({
+    result = {
         "id": patientInfo["patientId"],
         "familyName": patientInfo["familyName"],
         "givenName": patientInfo["givenName"],
         "images": list(map(lambda x: getImageLink(x["s3Key"], x["s3Bucket"]), images)),
         "diagnosis": list(map(fixDecimal, diagnosis))
-    })
+    }
+    for key, val in patientInfo.items():
+        result[key] = val
+        
+    return json.dumps(result)
 
 @webapp_endpoints.route("/consultations", methods=["GET"])
 def fetchConsultations():

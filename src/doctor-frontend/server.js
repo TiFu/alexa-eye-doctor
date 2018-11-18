@@ -1,1 +1,1 @@
-SERVER_URL = "http://b8dddd36.ngrok.io"
+SERVER_URL = "http://localhost:5000"
