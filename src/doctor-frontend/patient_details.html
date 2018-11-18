@@ -77,11 +77,28 @@
                 if (images.length >= 1) {
                     image = images[0]
                 }
+                console.log(entry)
+                let eyeColor = "" 
+                if (entry["EyeColorBrown"] && entry["EyeColorBlue"] && entry["EyeColorGreen"]) {
+                    if (entry["EyeColorBrown"] > entry["EyeColorBlue"] && entry["EyeColorBrown"] > entry["EyeColorGreen"]) {
+                        eyeColor = "Eye Color: Brown"
+                    }
+
+                    if (entry["EyeColorBlue"] > entry["EyeColorBrown"] && entry["EyeColorBlue"] > entry["EyeColorGreen"]) {
+                        eyeColor = "Eye Color: Blue"
+                    }
+
+                    if (entry["EyeColorGreen"] > entry["EyeColorBlue"] && entry["EyeColorGreen"] > entry["EyeColorBrown"]) {
+                        eyeColor = "Eye Color: Green"
+                    }
+                }
+
                 updateHtml = $("#patientEntry")
                             .html().replace(/{name}/g, entry["givenName"] + " " + entry["familyName"])
                             .replace(/{birthdate}/g, entry["birthdate"])
                             .replace(/{location}/g, entry["location"].replace("\n", "<br />"))
                             .replace(/{image}/g, image)
+                            .replace(/{eyeColor}/g, eyeColor)
                 $("#patientContent").html(updateHtml)
             }
 
@@ -146,11 +163,15 @@
             <div class="event-content-wrap">
                 <header class="entry-header d-flex flex-wrap align-items-center">
                     <h3 class="entry-title w-100 m-0"><a href="#">{name}</a></h3>
-    
+                    
                     <div class="posted-date">
                         <a href="#">{birthdate}</a>
                     </div><!-- .posted-date -->
-    
+                    <div class="posted-date">
+                        <a href="#">{eyeColor}</a>
+                    </div><!-- .posted-date -->
+                        
+
                 </header><!-- .entry-header -->
     
                 <div class="entry-content">
