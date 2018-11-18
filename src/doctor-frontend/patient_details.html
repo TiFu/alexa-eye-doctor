@@ -79,8 +79,12 @@
             }
 
             function updateImages(images) {
-                entries = images.filter((x) => !x.endsWith("face.jpg")).map((x, idx) => getImageEntry(x, idx==0));
-                $("#imageContainer").html(entries.reduce((prev, next) => prev + next))
+                let entries = ""
+                if (images.length > 0) {
+                    entries = images.filter((x) => !x.endsWith("face.jpg")).map((x, idx) => getImageEntry(x, idx==0));
+                    entries = entries.reduce((prev, next) => prev + next)
+                }
+                $("#imageContainer").html(entries)
             }
 
             function getImageEntry(image, active = false) {
@@ -92,7 +96,10 @@
 
             function updateDiagnosisData(data) {
                 console.log(data)
-                patientList = data.reverse().map((x) => getDiagnosisEntry(x)).reduce((prev, next) => prev + next)
+                let patientList = ""; 
+                if (data.length > 0) {
+                    patientList = data.reverse().map((x) => getDiagnosisEntry(x)).reduce((prev, next) => prev + next)
+                }
                 header = "<div class=\"section-heading\">" +
                             "<h2 class=\"entry-title\">Diagnosis History</h2>" + 
                         "</div><!-- .section-heading -->"
