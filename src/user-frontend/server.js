@@ -21,8 +21,6 @@ function registerDoctor() {
     doctor_socket.on("take_picture_intent", () => {
         window.location.href="./camera.html?patientId="
     })
-
-
 }
 
 function redirectToIndex() {

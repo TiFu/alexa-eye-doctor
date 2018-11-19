@@ -11,7 +11,7 @@ class FaceProcessor:
     ERROR_BAD_IMAGE = 1
     ERROR_BAD_EYE = 2
 
-    __EYE_AR_THRESH = 0.15
+    __EYE_AR_THRESH = 0.25
     __EYE_AR_CONSEC_FRAMES = 3
 
     def __init__(self):
