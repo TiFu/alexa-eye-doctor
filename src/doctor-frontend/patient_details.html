@@ -100,7 +100,7 @@
 
             function getImageEntry(image, active = false) {
                 return "<div class=\"carousel-item " + (active ? "active" : "") +"\">" +
-                        "<img class=\"d-block w-100\" src=\"" + image +"\" alt=\"First slide\">" +
+                        "<img class=\"d-block w-100\" id=\"eye_img\" id=\"car_it\" src=\"" + image +"\" alt=\"First slide\">" +
                 "</div>"
 
             }
@@ -144,7 +144,7 @@
     <div id="patientEntry" style="display: none">
         <div class="event-wrap d-flex flex-wrap justify-content-between">
             <figure class="m-0">
-                <img src="{image}" alt="">
+                <img src="{image}" id="face_img" alt="">
             </figure>
     
             <div class="event-content-wrap">
@@ -213,7 +213,7 @@
 
     <div class="home-page-events">
         <div class="container">
-            <div class="row" style="padding-bottom: 15px">
+            <div class="row" style="padding-bottom: 30px">
                 <div class="col-12 col-lg-12">
                     <div class="section-heading">
                         <h2 class="entry-title">Patient Overview</h2>
@@ -223,8 +223,8 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div clas?="col-12 col-lg-6">
+            <div class="row" style="padding-bottom: 30px">
+                <div class="col-12 col-lg-6">
                     <div class="section-heading">
                         <h2 class="entry-title">Eye Pictures</h2> 
                     </div><!-- .section-heading -->
@@ -258,7 +258,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-12">
-                        <p class="m-0">Made by Icebox</p>
+                        <p class="m-0">Alexa Eye Doctor @ Diagnose</p>
                     </div><!-- .col-12 -->
                 </div><!-- .row -->
             </div><!-- .container -->
