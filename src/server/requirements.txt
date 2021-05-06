@@ -20,7 +20,7 @@ docutils==0.14
 eventlet==0.24.1
 Flask==0.12.1
 Flask-Ask==0.9.8
-Flask-Cors==3.0.7
+Flask-Cors==3.0.9
 Flask-SocketIO==3.0.2
 greenlet==0.4.15
 idna==2.7
