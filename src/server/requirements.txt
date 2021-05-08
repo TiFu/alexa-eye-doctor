@@ -17,7 +17,7 @@ cycler==0.10.0
 dlib==19.16.0
 dnspython==1.15.0
 docutils==0.14
-eventlet==0.24.1
+eventlet==0.31.0
 Flask==0.12.1
 Flask-Ask==0.9.8
 Flask-Cors==3.0.7
